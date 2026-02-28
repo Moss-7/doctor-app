@@ -565,6 +565,103 @@
   .diagnose-btn:active {
     transform: translateY(0);
   }
+
+  /* ===== レスポンシブ ===== */
+
+  /* タブレット縦向き・小画面（幅768px以下） → 1カラム縦並び */
+  @media (max-width: 768px) {
+    .main-layout {
+      flex-direction: column;
+      min-height: auto;
+    }
+
+    .left-panel {
+      width: 100%;
+    }
+
+    .right-panel {
+      width: 100%;
+      min-width: auto;
+      border-left: none;
+      border-top: 3px dashed #f0e0f0;
+    }
+
+    .patient-grid {
+      grid-template-columns: auto 1fr;
+    }
+  }
+
+  /* スマホ（幅480px以下） → さらにコンパクト */
+  @media (max-width: 480px) {
+    body {
+      padding: 6px;
+      font-size: 14px;
+    }
+
+    .header {
+      padding: 8px 12px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      font-size: 18px;
+    }
+
+    .lamps {
+      gap: 5px;
+    }
+
+    .lamp {
+      width: 16px;
+      height: 16px;
+    }
+
+    .section {
+      padding: 10px;
+    }
+
+    .toggle-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+      min-width: 64px;
+    }
+
+    .severity-dot {
+      width: 24px;
+      height: 24px;
+    }
+
+    .symptom-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .diagnose-btn {
+      padding: 12px;
+      font-size: 17px;
+    }
+
+    .result-box .result-text {
+      font-size: 16px;
+    }
+
+    .temp-preset-btn {
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+  }
+
+  /* 大画面横長（幅1200px以上） → 余裕のあるレイアウト */
+  @media (min-width: 1200px) {
+    .right-panel {
+      width: 42%;
+    }
+
+    .result-box .result-text {
+      font-size: 20px;
+      min-height: 52px;
+    }
+  }
 </style>
 </head>
 <body>
