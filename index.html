@@ -440,6 +440,58 @@
     animation: btnBounce 0.3s ease;
   }
 
+  /* 体温入力 */
+  .temperature-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .temperature-input input {
+    width: 100px;
+    padding: 8px 10px;
+    border: 2px solid #f8bbd0;
+    border-radius: 10px;
+    font-size: 20px;
+    font-family: inherit;
+    text-align: center;
+    outline: none;
+    font-weight: bold;
+  }
+
+  .temperature-input input:focus {
+    border-color: #e91e63;
+    box-shadow: 0 0 0 3px rgba(233,30,99,0.15);
+  }
+
+  .temp-unit {
+    font-size: 18px;
+    font-weight: bold;
+    color: #e91e63;
+  }
+
+  .temp-status {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .temp-status.normal {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .temp-status.slight {
+    background: #fff8e1;
+    color: #f57f17;
+  }
+
+  .temp-status.fever {
+    background: #ffebee;
+    color: #c62828;
+  }
+
   /* しんだんボタン */
   .diagnose-btn {
     width: 100%;
@@ -556,6 +608,16 @@
         </div>
       </div>
 
+      <!-- たいおん -->
+      <div class="section">
+        <div class="section-title">🌡 たいおん</div>
+        <div class="temperature-input">
+          <input type="number" id="temperature" min="35.0" max="42.0" step="0.1" placeholder="36.5">
+          <span class="temp-unit">℃</span>
+          <span class="temp-status" id="tempStatus"></span>
+        </div>
+      </div>
+
       <!-- どんなかんじ -->
       <div class="section">
         <div class="section-title">🤔 どんな かんじ？</div>
@@ -587,6 +649,8 @@
           <dd id="summaryGender">ー</dd>
           <dt>たんじょうび</dt>
           <dd id="summaryBirthday">ー</dd>
+          <dt>たいおん</dt>
+          <dd id="summaryTemp">ー</dd>
         </dl>
       </div>
 
@@ -630,6 +694,30 @@
   document.getElementById('patientName').addEventListener('input', updateSummary);
   document.querySelectorAll('input[name="gender"]').forEach(r => r.addEventListener('change', updateSummary));
   document.getElementById('birthDate').addEventListener('change', updateSummary);
+  document.getElementById('temperature').addEventListener('input', () => {
+    updateTempStatus();
+    updateSummary();
+  });
+
+  function updateTempStatus() {
+    const val = parseFloat(document.getElementById('temperature').value);
+    const el = document.getElementById('tempStatus');
+    if (isNaN(val)) {
+      el.textContent = '';
+      el.className = 'temp-status';
+      return;
+    }
+    if (val < 37.0) {
+      el.textContent = 'へいねつ';
+      el.className = 'temp-status normal';
+    } else if (val < 37.5) {
+      el.textContent = 'びねつ';
+      el.className = 'temp-status slight';
+    } else {
+      el.textContent = 'おねつ！';
+      el.className = 'temp-status fever';
+    }
+  }
 
   function updateSummary() {
     const name = document.getElementById('patientName').value;
@@ -657,6 +745,16 @@
     } else {
       bdDD.textContent = 'ー';
       bdDD.className = '';
+    }
+
+    const tempVal = document.getElementById('temperature').value;
+    const tempDD = document.getElementById('summaryTemp');
+    if (tempVal) {
+      tempDD.textContent = tempVal + ' ℃';
+      tempDD.className = 'filled';
+    } else {
+      tempDD.textContent = 'ー';
+      tempDD.className = '';
     }
   }
 
@@ -839,7 +937,10 @@
   document.getElementById('diagnoseBtn').addEventListener('click', () => {
     const parts = Object.keys(state.selectedParts);
 
-    if (parts.length === 0 && state.selectedSymptoms.size === 0) {
+    const temp = parseFloat(document.getElementById('temperature').value);
+    const hasFever = !isNaN(temp) && temp >= 37.5;
+
+    if (parts.length === 0 && state.selectedSymptoms.size === 0 && !hasFever) {
       setResult('resultDiagnosis', 'とっても げんき だね！');
       setResult('resultMedicine', 'おくすりは いらないよ！');
       setResult('resultAdvice', 'この ちょうしで がんばろう！');
@@ -857,7 +958,9 @@
       setResult('resultDiagnosis', pick(diagList));
       setResult('resultMedicine', pick(medicines));
 
-      if (maxStrength >= 4) {
+      if (hasFever) {
+        setResult('resultAdvice', 'おねつが あるから しっかり やすんでね！');
+      } else if (maxStrength >= 4) {
         setResult('resultAdvice', pick(advicesSerious));
       } else {
         setResult('resultAdvice', pick(advicesNormal));
@@ -871,6 +974,9 @@
     document.getElementById('patientName').value = '';
     document.querySelectorAll('input[name="gender"]').forEach(r => r.checked = false);
     document.getElementById('birthDate').value = '';
+    document.getElementById('temperature').value = '';
+    document.getElementById('tempStatus').textContent = '';
+    document.getElementById('tempStatus').className = 'temp-status';
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     state.selectedParts = {};
     document.querySelectorAll('.stars').forEach(s => {
