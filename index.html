@@ -307,20 +307,27 @@
   }
 
   .birthday-input-wrap input[type="date"] {
-    padding: 7px 10px;
+    padding: 12px 14px;
     border: 2px solid #f8bbd0;
-    border-radius: 10px;
-    font-size: 15px;
+    border-radius: 12px;
+    font-size: 20px;
     font-family: inherit;
     outline: none;
     width: 100%;
     color: #5d4037;
     background: #fff;
+    min-height: 48px;
   }
 
   .birthday-input-wrap input[type="date"]:focus {
     border-color: #e91e63;
     box-shadow: 0 0 0 3px rgba(233,30,99,0.15);
+  }
+
+  .birthday-input-wrap input[type="date"]::-webkit-calendar-picker-indicator {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
   }
 
   .span-2 {
@@ -375,38 +382,50 @@
     100% { transform: scale(1); }
   }
 
-  /* 星レーティング */
-  .stars {
+  /* 重症度レーティング（●ドット） */
+  .severity {
     display: flex;
-    gap: 2px;
+    gap: 4px;
   }
 
-  .star {
-    font-size: 26px;
-    color: #e8e8e8;
+  .severity-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    background: #f0f0f0;
     transition: all 0.15s ease;
     user-select: none;
-    line-height: 1;
-  }
-
-  .stars.disabled .star {
-    color: #e8e8e8;
     cursor: default;
-    opacity: 0.5;
   }
 
-  .stars.enabled .star {
+  .severity.disabled .severity-dot {
+    opacity: 0.35;
+  }
+
+  .severity.enabled .severity-dot {
     cursor: pointer;
-    color: #e0e0e0;
     opacity: 1;
   }
 
-  .stars.enabled .star.filled {
-    color: #ffb300;
+  .severity.enabled .severity-dot:hover {
+    transform: scale(1.15);
   }
 
-  .stars.enabled .star:hover {
-    transform: scale(1.2);
+  .severity.enabled .severity-dot.filled[data-val="1"] {
+    background: #a5d6a7; border-color: #66bb6a;
+  }
+  .severity.enabled .severity-dot.filled[data-val="2"] {
+    background: #fff176; border-color: #fdd835;
+  }
+  .severity.enabled .severity-dot.filled[data-val="3"] {
+    background: #ffb74d; border-color: #ffa726;
+  }
+  .severity.enabled .severity-dot.filled[data-val="4"] {
+    background: #ef5350; border-color: #e53935;
+  }
+  .severity.enabled .severity-dot.filled[data-val="5"] {
+    background: #c62828; border-color: #b71c1c;
   }
 
   /* 症状ボタン */
@@ -441,13 +460,14 @@
   }
 
   /* 体温入力 */
-  .temperature-input {
+  .temperature-row {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-bottom: 8px;
   }
 
-  .temperature-input input {
+  .temperature-row input {
     width: 100px;
     padding: 8px 10px;
     border: 2px solid #f8bbd0;
@@ -459,7 +479,7 @@
     font-weight: bold;
   }
 
-  .temperature-input input:focus {
+  .temperature-row input:focus {
     border-color: #e91e63;
     box-shadow: 0 0 0 3px rgba(233,30,99,0.15);
   }
@@ -490,6 +510,35 @@
   .temp-status.fever {
     background: #ffebee;
     color: #c62828;
+  }
+
+  .temp-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .temp-preset-btn {
+    padding: 6px 12px;
+    border: 2px solid #ef9a9a;
+    border-radius: 20px;
+    background: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #c62828;
+    user-select: none;
+  }
+
+  .temp-preset-btn:hover {
+    background: #ffebee;
+  }
+
+  .temp-preset-btn.active {
+    background: #ef9a9a;
+    color: #fff;
+    border-color: #e53935;
   }
 
   /* しんだんボタン */
@@ -571,38 +620,38 @@
         <div class="part-rows" id="bodyParts">
           <div class="part-row">
             <button class="toggle-btn" data-part="おなか">おなか</button>
-            <div class="stars disabled" data-part="おなか">
-              <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+            <div class="severity disabled" data-part="おなか">
+              <div class="severity-dot" data-val="1"></div><div class="severity-dot" data-val="2"></div><div class="severity-dot" data-val="3"></div><div class="severity-dot" data-val="4"></div><div class="severity-dot" data-val="5"></div>
             </div>
           </div>
           <div class="part-row">
             <button class="toggle-btn" data-part="あたま">あたま</button>
-            <div class="stars disabled" data-part="あたま">
-              <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+            <div class="severity disabled" data-part="あたま">
+              <div class="severity-dot" data-val="1"></div><div class="severity-dot" data-val="2"></div><div class="severity-dot" data-val="3"></div><div class="severity-dot" data-val="4"></div><div class="severity-dot" data-val="5"></div>
             </div>
           </div>
           <div class="part-row">
             <button class="toggle-btn" data-part="のど">のど</button>
-            <div class="stars disabled" data-part="のど">
-              <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+            <div class="severity disabled" data-part="のど">
+              <div class="severity-dot" data-val="1"></div><div class="severity-dot" data-val="2"></div><div class="severity-dot" data-val="3"></div><div class="severity-dot" data-val="4"></div><div class="severity-dot" data-val="5"></div>
             </div>
           </div>
           <div class="part-row">
             <button class="toggle-btn" data-part="て・あし">て・あし</button>
-            <div class="stars disabled" data-part="て・あし">
-              <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+            <div class="severity disabled" data-part="て・あし">
+              <div class="severity-dot" data-val="1"></div><div class="severity-dot" data-val="2"></div><div class="severity-dot" data-val="3"></div><div class="severity-dot" data-val="4"></div><div class="severity-dot" data-val="5"></div>
             </div>
           </div>
           <div class="part-row">
             <button class="toggle-btn" data-part="みみ">みみ</button>
-            <div class="stars disabled" data-part="みみ">
-              <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+            <div class="severity disabled" data-part="みみ">
+              <div class="severity-dot" data-val="1"></div><div class="severity-dot" data-val="2"></div><div class="severity-dot" data-val="3"></div><div class="severity-dot" data-val="4"></div><div class="severity-dot" data-val="5"></div>
             </div>
           </div>
           <div class="part-row">
             <button class="toggle-btn" data-part="め">め</button>
-            <div class="stars disabled" data-part="め">
-              <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span>
+            <div class="severity disabled" data-part="め">
+              <div class="severity-dot" data-val="1"></div><div class="severity-dot" data-val="2"></div><div class="severity-dot" data-val="3"></div><div class="severity-dot" data-val="4"></div><div class="severity-dot" data-val="5"></div>
             </div>
           </div>
         </div>
@@ -611,7 +660,16 @@
       <!-- たいおん -->
       <div class="section">
         <div class="section-title">🌡 たいおん</div>
-        <div class="temperature-input">
+        <div class="temp-presets" id="tempPresets">
+          <button class="temp-preset-btn" data-temp="36.0">36.0℃</button>
+          <button class="temp-preset-btn" data-temp="36.5">36.5℃</button>
+          <button class="temp-preset-btn" data-temp="37.0">37.0℃</button>
+          <button class="temp-preset-btn" data-temp="37.5">37.5℃</button>
+          <button class="temp-preset-btn" data-temp="38.0">38.0℃</button>
+          <button class="temp-preset-btn" data-temp="38.5">38.5℃</button>
+          <button class="temp-preset-btn" data-temp="39.0">39.0℃</button>
+        </div>
+        <div class="temperature-row">
           <input type="number" id="temperature" min="35.0" max="42.0" step="0.1" placeholder="36.5">
           <span class="temp-unit">℃</span>
           <span class="temp-status" id="tempStatus"></span>
@@ -695,6 +753,17 @@
   document.querySelectorAll('input[name="gender"]').forEach(r => r.addEventListener('change', updateSummary));
   document.getElementById('birthDate').addEventListener('change', updateSummary);
   document.getElementById('temperature').addEventListener('input', () => {
+    document.querySelectorAll('.temp-preset-btn').forEach(b => b.classList.remove('active'));
+    updateTempStatus();
+    updateSummary();
+  });
+
+  document.getElementById('tempPresets').addEventListener('click', (e) => {
+    const btn = e.target.closest('.temp-preset-btn');
+    if (!btn) return;
+    document.querySelectorAll('.temp-preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('temperature').value = btn.dataset.temp;
     updateTempStatus();
     updateSummary();
   });
@@ -794,39 +863,39 @@
     const btn = e.target.closest('.toggle-btn');
     if (btn) {
       const part = btn.dataset.part;
-      const starsDiv = document.querySelector('.stars[data-part="' + part + '"]');
+      const sevDiv = document.querySelector('.severity[data-part="' + part + '"]');
       if (btn.classList.contains('active')) {
         btn.classList.remove('active');
         delete state.selectedParts[part];
-        starsDiv.classList.remove('enabled');
-        starsDiv.classList.add('disabled');
-        starsDiv.querySelectorAll('.star').forEach(s => s.classList.remove('filled'));
+        sevDiv.classList.remove('enabled');
+        sevDiv.classList.add('disabled');
+        sevDiv.querySelectorAll('.severity-dot').forEach(s => s.classList.remove('filled'));
       } else {
         btn.classList.add('active');
         state.selectedParts[part] = 1;
-        starsDiv.classList.remove('disabled');
-        starsDiv.classList.add('enabled');
-        updateStarsUI(part);
+        sevDiv.classList.remove('disabled');
+        sevDiv.classList.add('enabled');
+        updateSeverityUI(part);
       }
       return;
     }
 
-    // 星クリック
-    const star = e.target.closest('.star');
-    if (star) {
-      const starsDiv = star.closest('.stars');
-      if (starsDiv.classList.contains('disabled')) return;
-      const part = starsDiv.dataset.part;
-      const val = Number(star.dataset.val);
+    // ドットクリック
+    const dot = e.target.closest('.severity-dot');
+    if (dot) {
+      const sevDiv = dot.closest('.severity');
+      if (sevDiv.classList.contains('disabled')) return;
+      const part = sevDiv.dataset.part;
+      const val = Number(dot.dataset.val);
       state.selectedParts[part] = val;
-      updateStarsUI(part);
+      updateSeverityUI(part);
     }
   });
 
-  function updateStarsUI(part) {
-    const starsDiv = document.querySelector('.stars[data-part="' + part + '"]');
+  function updateSeverityUI(part) {
+    const sevDiv = document.querySelector('.severity[data-part="' + part + '"]');
     const level = state.selectedParts[part] || 0;
-    starsDiv.querySelectorAll('.star').forEach(s => {
+    sevDiv.querySelectorAll('.severity-dot').forEach(s => {
       if (Number(s.dataset.val) <= level) {
         s.classList.add('filled');
       } else {
@@ -979,11 +1048,12 @@
     document.getElementById('tempStatus').className = 'temp-status';
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     state.selectedParts = {};
-    document.querySelectorAll('.stars').forEach(s => {
+    document.querySelectorAll('.severity').forEach(s => {
       s.classList.remove('enabled');
       s.classList.add('disabled');
-      s.querySelectorAll('.star').forEach(st => st.classList.remove('filled'));
+      s.querySelectorAll('.severity-dot').forEach(st => st.classList.remove('filled'));
     });
+    document.querySelectorAll('.temp-preset-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.symptom-btn').forEach(b => b.classList.remove('active'));
     state.selectedSymptoms.clear();
 
