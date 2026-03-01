@@ -391,6 +391,45 @@
     color: #c62828;
   }
 
+  /* けんさボタン */
+  .test-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .test-toggle-btn {
+    padding: 8px 20px;
+    border: 2px solid #80cbc4;
+    border-radius: 30px;
+    background: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #00695c;
+    user-select: none;
+  }
+
+  .test-toggle-btn:hover {
+    background: #e0f2f1;
+  }
+
+  .test-toggle-btn.active {
+    background: #80cbc4;
+    color: #fff;
+    border-color: #00897b;
+    animation: btnBounce 0.3s ease;
+  }
+
+  /* けんさ結果ボックス */
+  .result-test {
+    background: #e8f5e9;
+    border: 2px solid #a5d6a7;
+  }
+  .result-test h3 { color: #2e7d32; }
+  .result-test .result-text.empty { color: #ddd; }
+
   /* しんだんボタン */
   .diagnose-btn {
     width: 100%;
@@ -825,6 +864,15 @@
         </div>
       </div>
 
+      <!-- けんさ（37.5以上のときに表示） -->
+      <div class="section" id="testSection" style="display:none;">
+        <div class="section-title">🧪 けんさ する？</div>
+        <div class="test-options">
+          <button class="test-toggle-btn" data-test="covid">コロナ けんさ</button>
+          <button class="test-toggle-btn" data-test="influ">インフル けんさ</button>
+        </div>
+      </div>
+
       <!-- どんなかんじ -->
       <div class="section">
         <div class="section-title">🤔 どんな かんじ？</div>
@@ -873,6 +921,10 @@
           <h3>📝 せんせいから ひとこと</h3>
           <div class="result-text empty" id="resultAdvice">しんだん まち…</div>
         </div>
+        <div class="result-box result-test" id="testResultBox" style="display:none;">
+          <h3>🧪 けんさ けっか</h3>
+          <div class="result-text empty" id="resultTest">けんさ まち…</div>
+        </div>
       </div>
 
       <button class="reset-btn" id="resetBtn">👋 つぎの かんじゃさん</button>
@@ -885,7 +937,8 @@
   // --- 状態管理 ---
   const state = {
     selectedParts: {},
-    selectedSymptoms: new Set()
+    selectedSymptoms: new Set(),
+    selectedTests: new Set()
   };
 
   // --- 受付番号 ---
@@ -917,10 +970,22 @@
   function updateTempStatus() {
     const val = parseFloat(document.getElementById('temperature').value);
     const el = document.getElementById('tempStatus');
-    if (isNaN(val)) { el.textContent = ''; el.className = 'temp-status'; return; }
+    const testSection = document.getElementById('testSection');
+    if (isNaN(val)) {
+      el.textContent = ''; el.className = 'temp-status';
+      testSection.style.display = 'none';
+      state.selectedTests.clear();
+      document.querySelectorAll('.test-toggle-btn').forEach(b => b.classList.remove('active'));
+      return;
+    }
     if (val < 37.0) { el.textContent = 'へいねつ'; el.className = 'temp-status normal'; }
     else if (val < 37.5) { el.textContent = 'びねつ'; el.className = 'temp-status slight'; }
     else { el.textContent = 'おねつ！'; el.className = 'temp-status fever'; }
+    testSection.style.display = val >= 37.5 ? '' : 'none';
+    if (val < 37.5) {
+      state.selectedTests.clear();
+      document.querySelectorAll('.test-toggle-btn').forEach(b => b.classList.remove('active'));
+    }
   }
 
   function updateSummary() {
@@ -1023,6 +1088,16 @@
     else state.selectedSymptoms.delete(symptom);
   });
 
+  // --- けんさボタン ---
+  document.getElementById('testSection').addEventListener('click', (e) => {
+    const btn = e.target.closest('.test-toggle-btn');
+    if (!btn) return;
+    const test = btn.dataset.test;
+    btn.classList.toggle('active');
+    if (btn.classList.contains('active')) state.selectedTests.add(test);
+    else state.selectedTests.delete(test);
+  });
+
   // --- 診断 ---
   const diagnoses = {
     'おなか': ['おなかの かぜ だね！','すこし おなかが つかれてるね','おなかの むしさんが げんき すぎるね'],
@@ -1066,6 +1141,31 @@
       else setResult('resultAdvice', pick(advicesNormal));
     }
 
+    // けんさ結果
+    const testBox = document.getElementById('testResultBox');
+    if (state.selectedTests.size > 0) {
+      const lines = [];
+      if (state.selectedTests.has('covid')) {
+        const pos = Math.random() < 0.3;
+        lines.push('コロナ：' + (pos ? '🔴 ようせい' : '🟢 いんせい'));
+        if (pos) setResult('resultAdvice', 'コロナが みつかったよ！ おうちで ゆっくり やすんでね！');
+      }
+      if (state.selectedTests.has('influ')) {
+        const pos = Math.random() < 0.3;
+        lines.push('インフル：' + (pos ? '🔴 ようせい' : '🟢 いんせい'));
+        if (pos) setResult('resultAdvice', 'インフルエンザ だよ！ しっかり おやすみ してね！');
+      }
+      if (state.selectedTests.has('covid') && state.selectedTests.has('influ')) {
+        const covidPos = lines[0].includes('ようせい');
+        const influPos = lines[1].includes('ようせい');
+        if (covidPos && influPos) setResult('resultAdvice', 'コロナも インフルも みつかったよ！ たくさん ゆっくり やすんでね！');
+      }
+      setResult('resultTest', lines.join('\n'));
+      testBox.style.display = '';
+    } else {
+      testBox.style.display = 'none';
+    }
+
     // モバイルのみ：結果パネルへ自動スクロール
     if (window.innerWidth < 640) {
       const rightPanel = document.querySelector('.right-panel');
@@ -1091,9 +1191,14 @@
     document.querySelectorAll('.temp-preset-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.symptom-btn').forEach(b => b.classList.remove('active'));
     state.selectedSymptoms.clear();
+    document.getElementById('testSection').style.display = 'none';
+    document.querySelectorAll('.test-toggle-btn').forEach(b => b.classList.remove('active'));
+    state.selectedTests.clear();
+    document.getElementById('testResultBox').style.display = 'none';
     clearResult('resultDiagnosis', 'しんだん まち…');
     clearResult('resultMedicine', 'しんだん まち…');
     clearResult('resultAdvice', 'しんだん まち…');
+    clearResult('resultTest', 'けんさ まち…');
     updateSummary();
   });
 </script>
