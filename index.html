@@ -13,28 +13,25 @@
 
   html, body {
     height: 100%;
-    overflow: hidden;
   }
 
   body {
     font-family: 'Hiragino Maru Gothic Pro', 'BIZ UDPGothic', 'Yu Gothic', sans-serif;
     background: linear-gradient(135deg, #fce4ec 0%, #e1f5fe 50%, #fff9c4 100%);
-    height: 100vh;
+    min-height: 100vh;
     font-size: 18px;
     color: #5d4037;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 8px;
   }
 
   /* ===== カルテ全体 ===== */
   .karte {
-    width: 1280px;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    overflow: hidden;
-    transform-origin: center center;
   }
 
   /* ===== ヘッダー ===== */
@@ -94,6 +91,7 @@
   /* ===== メインレイアウト（横2カラム） ===== */
   .main-layout {
     display: flex;
+    flex-direction: column;
   }
 
   /* ===== 左側：入力エリア ===== */
@@ -421,7 +419,6 @@
   /* ===== 右側：結果エリア ===== */
   .right-panel {
     width: 38%;
-    min-width: 340px;
     background: #fdf6ff;
     border-left: 3px dashed #f0e0f0;
     padding: 14px;
@@ -558,6 +555,164 @@
 
   .reset-btn:hover {
     background: #b3e5fc;
+  }
+
+  /* ===========================
+     RESPONSIVE LAYOUT
+     Mobile-first breakpoints:
+     - Base (default): < 640px  → single column, scrollable
+     - Tablet:  640px – 1024px  → 2 columns, better proportions
+     - Desktop: > 1024px        → original 2-column layout
+  =========================== */
+
+  /* --- TABLET: 640px and up --- */
+  @media (min-width: 640px) {
+    .main-layout {
+      flex-direction: row;
+    }
+
+    .left-panel {
+      flex: 1;
+    }
+
+    .right-panel {
+      width: 42%;
+      border-left: 3px dashed #f0e0f0;
+      border-top: none;
+    }
+  }
+
+  /* --- DESKTOP: 1024px and up --- */
+  @media (min-width: 1024px) {
+    .right-panel {
+      width: 38%;
+    }
+  }
+
+  /* --- MOBILE: 639px and below --- */
+  @media (max-width: 639px) {
+    /* 左右パネルを縦積みに */
+    .left-panel {
+      width: 100%;
+    }
+
+    .right-panel {
+      width: 100%;
+      border-left: none;
+      border-top: 3px dashed #f0e0f0;
+      padding: 12px;
+    }
+
+    /* ヘッダー：キーボードヒント非表示・コンパクト化 */
+    .key-hint {
+      display: none;
+    }
+
+    .header {
+      padding: 8px 12px;
+      gap: 8px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+    }
+
+    .lamps {
+      gap: 5px;
+    }
+
+    .lamp {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* 患者情報グリッド：4列→2列 */
+    .patient-grid {
+      grid-template-columns: auto 1fr;
+      gap: 6px 10px;
+    }
+
+    /* 重症度ドット：26px→44px（タッチターゲット確保） */
+    .severity {
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .severity-dot {
+      width: 44px;
+      height: 44px;
+    }
+
+    .severity.enabled .severity-dot:hover {
+      transform: none;
+    }
+
+    .part-row {
+      padding: 4px 8px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-btn {
+      min-width: 80px;
+      font-size: 16px;
+    }
+
+    /* 体温プリセットボタン：等幅配置 */
+    .temp-preset-btn {
+      padding: 8px 10px;
+      font-size: 15px;
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .temperature-row {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .temperature-row input {
+      width: 120px;
+      font-size: 22px;
+      padding: 8px 10px;
+    }
+
+    /* 症状ボタン */
+    .symptom-btn {
+      padding: 10px 18px;
+      font-size: 16px;
+    }
+
+    /* 診断ボタン */
+    .diagnose-btn {
+      padding: 16px;
+      font-size: 20px;
+    }
+
+    /* カルテ結果エリア */
+    .patient-summary-grid {
+      font-size: 15px;
+      gap: 4px 8px;
+    }
+
+    .result-box {
+      padding: 10px;
+    }
+
+    .result-box .result-text {
+      font-size: 18px;
+    }
+
+    .reception-number {
+      font-size: 18px;
+      letter-spacing: 2px;
+    }
+
+    .reset-btn {
+      padding: 14px;
+      font-size: 16px;
+    }
   }
 </style>
 </head>
@@ -727,20 +882,6 @@
 </div>
 
 <script>
-  // --- 自動スケーリング ---
-  // コンテンツの自然なサイズを基準に、画面に収まるよう縮小/拡大
-  function autoScale() {
-    const karte = document.querySelector('.karte');
-    const pad = 16;
-    const scaleX = (window.innerWidth - pad) / karte.scrollWidth;
-    const scaleY = (window.innerHeight - pad) / karte.scrollHeight;
-    const scale = Math.min(scaleX, scaleY, 1.3);
-    karte.style.transform = 'scale(' + scale + ')';
-  }
-  autoScale();
-  window.addEventListener('resize', autoScale);
-  screen.orientation && screen.orientation.addEventListener('change', () => setTimeout(autoScale, 100));
-
   // --- 状態管理 ---
   const state = {
     selectedParts: {},
@@ -808,6 +949,22 @@
   // --- ランプ ---
   const lampColors = ['#f48fb1','#81d4fa','#fff176','#a5d6a7','#ce93d8','#ffab91','#80deea','#f8bbd0'];
   const lamps = document.querySelectorAll('.lamp');
+  // タッチでランプ点灯（モバイル向け）
+  document.querySelector('.karte').addEventListener('touchstart', () => {
+    if (window.innerWidth >= 640) return;
+    const count = Math.floor(Math.random() * 2) + 1;
+    const indices = [];
+    while (indices.length < count) { const idx = Math.floor(Math.random() * lamps.length); if (!indices.includes(idx)) indices.push(idx); }
+    indices.forEach(idx => {
+      const lamp = lamps[idx];
+      const color = lampColors[Math.floor(Math.random() * lampColors.length)];
+      lamp.style.background = color;
+      lamp.style.setProperty('--glow-color', color);
+      lamp.classList.remove('on'); void lamp.offsetWidth; lamp.classList.add('on');
+      setTimeout(() => { lamp.classList.remove('on'); lamp.style.background = '#e0e0e0'; }, 400 + Math.random() * 300);
+    });
+  }, { passive: true });
+
   document.addEventListener('keydown', () => {
     const count = Math.floor(Math.random() * 3) + 1;
     const indices = [];
@@ -907,6 +1064,12 @@
       if (hasFever) setResult('resultAdvice', 'おねつが あるから しっかり やすんでね！');
       else if (maxStrength >= 4) setResult('resultAdvice', pick(advicesSerious));
       else setResult('resultAdvice', pick(advicesNormal));
+    }
+
+    // モバイルのみ：結果パネルへ自動スクロール
+    if (window.innerWidth < 640) {
+      const rightPanel = document.querySelector('.right-panel');
+      if (rightPanel) rightPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
 
