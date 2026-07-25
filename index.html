@@ -690,6 +690,18 @@
   }
   .camera-close-btn:hover { background: #e0e0e0; }
 
+  .camera-switch-btn {
+    padding: 12px 20px;
+    border: 2px solid #b3e5fc;
+    border-radius: 30px;
+    background: #e1f5fe;
+    color: #0288d1;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .camera-switch-btn:hover { background: #b3e5fc; }
+
   .patient-photo-wrap {
     text-align: center;
     margin-bottom: 10px;
@@ -1054,6 +1066,7 @@
     <div class="camera-error" id="cameraError" style="display:none;"></div>
     <div class="camera-controls" id="cameraControls">
       <button class="camera-capture-btn" id="captureBtn">🔴 パチリ！</button>
+      <button class="camera-switch-btn" id="cameraSwitchBtn">🔄 きりかえ</button>
       <button class="camera-close-btn" id="cameraCloseBtn">✕ とじる</button>
     </div>
   </div>
@@ -1301,21 +1314,21 @@
 
   // --- カメラ ---
   let cameraStream = null;
+  let facingMode = 'environment';
 
   document.getElementById('cameraBtn').addEventListener('click', openCamera);
 
-  async function openCamera() {
-    const modal = document.getElementById('cameraModal');
+  async function startStream() {
     const video = document.getElementById('cameraVideo');
     const errorEl = document.getElementById('cameraError');
     const controls = document.getElementById('cameraControls');
-    errorEl.style.display = 'none';
-    video.style.display = '';
-    controls.style.display = '';
-    modal.style.display = 'flex';
+    if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
     try {
-      cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: false });
       video.srcObject = cameraStream;
+      video.style.display = '';
+      errorEl.style.display = 'none';
+      controls.querySelector('.camera-capture-btn').style.display = '';
     } catch (err) {
       video.style.display = 'none';
       controls.querySelector('.camera-capture-btn').style.display = 'none';
@@ -1323,6 +1336,17 @@
       errorEl.style.display = '';
     }
   }
+
+  async function openCamera() {
+    facingMode = 'environment';
+    document.getElementById('cameraModal').style.display = 'flex';
+    await startStream();
+  }
+
+  document.getElementById('cameraSwitchBtn').addEventListener('click', async () => {
+    facingMode = facingMode === 'environment' ? 'user' : 'environment';
+    await startStream();
+  });
 
   document.getElementById('cameraCloseBtn').addEventListener('click', closeCamera);
 
