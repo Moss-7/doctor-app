@@ -596,6 +596,114 @@
     background: #b3e5fc;
   }
 
+  /* ===== カメラ ===== */
+  .camera-btn {
+    margin-top: 10px;
+    padding: 8px 18px;
+    border: 2px solid #f8bbd0;
+    border-radius: 30px;
+    background: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    color: #e91e63;
+    transition: all 0.2s ease;
+  }
+  .camera-btn:hover { background: #fce4ec; }
+
+  .camera-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .camera-modal-inner {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .camera-modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #e91e63;
+  }
+
+  .camera-video {
+    width: 100%;
+    max-height: 300px;
+    border-radius: 12px;
+    background: #222;
+    object-fit: cover;
+  }
+
+  .camera-error {
+    color: #c62828;
+    font-size: 15px;
+    text-align: center;
+    padding: 20px;
+    line-height: 1.8;
+  }
+
+  .camera-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .camera-capture-btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #f48fb1, #ce93d8);
+    color: #fff;
+    font-size: 18px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  .camera-capture-btn:hover { transform: scale(1.05); }
+  .camera-capture-btn:active { transform: scale(0.97); }
+
+  .camera-close-btn {
+    padding: 12px 20px;
+    border: 2px solid #ccc;
+    border-radius: 30px;
+    background: #f5f5f5;
+    color: #666;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .camera-close-btn:hover { background: #e0e0e0; }
+
+  .patient-photo-wrap {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .patient-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid #f8bbd0;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(233,30,99,0.2);
+  }
+
   /* ===========================
      RESPONSIVE LAYOUT
      Mobile-first breakpoints:
@@ -800,6 +908,7 @@
             <input type="date" id="birthDate" min="2019-01-01" max="2026-12-31">
           </div>
         </div>
+        <button class="camera-btn" id="cameraBtn">📷 しゃしんを とる</button>
       </div>
 
       <!-- どこがつらい -->
@@ -894,6 +1003,9 @@
       <div class="section-title">📋 カルテ</div>
 
       <div class="patient-summary">
+        <div class="patient-photo-wrap" id="patientPhotoWrap" style="display:none;">
+          <img class="patient-photo" id="patientPhoto" src="" alt="かんじゃさんの しゃしん">
+        </div>
         <dl class="patient-summary-grid">
           <dt>うけつけ No.</dt>
           <dd><span class="reception-number" id="receptionNumber">0001</span></dd>
@@ -930,6 +1042,20 @@
       <button class="reset-btn" id="resetBtn">👋 つぎの かんじゃさん</button>
     </div>
 
+  </div>
+</div>
+
+<!-- カメラモーダル -->
+<div class="camera-modal" id="cameraModal" style="display:none;">
+  <div class="camera-modal-inner">
+    <div class="camera-modal-title">📷 しゃしんを とるよ！</div>
+    <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
+    <canvas id="cameraCanvas" style="display:none;"></canvas>
+    <div class="camera-error" id="cameraError" style="display:none;"></div>
+    <div class="camera-controls" id="cameraControls">
+      <button class="camera-capture-btn" id="captureBtn">🔴 パチリ！</button>
+      <button class="camera-close-btn" id="cameraCloseBtn">✕ とじる</button>
+    </div>
   </div>
 </div>
 
@@ -1173,6 +1299,61 @@
     }
   });
 
+  // --- カメラ ---
+  let cameraStream = null;
+
+  document.getElementById('cameraBtn').addEventListener('click', openCamera);
+
+  async function openCamera() {
+    const modal = document.getElementById('cameraModal');
+    const video = document.getElementById('cameraVideo');
+    const errorEl = document.getElementById('cameraError');
+    const controls = document.getElementById('cameraControls');
+    errorEl.style.display = 'none';
+    video.style.display = '';
+    controls.style.display = '';
+    modal.style.display = 'flex';
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      video.srcObject = cameraStream;
+    } catch (err) {
+      video.style.display = 'none';
+      controls.querySelector('.camera-capture-btn').style.display = 'none';
+      errorEl.textContent = 'カメラが つかえないよ😢\nカメラの きょかを かくにん してね。';
+      errorEl.style.display = '';
+    }
+  }
+
+  document.getElementById('cameraCloseBtn').addEventListener('click', closeCamera);
+
+  document.getElementById('cameraModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('cameraModal')) closeCamera();
+  });
+
+  function closeCamera() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      cameraStream = null;
+    }
+    const video = document.getElementById('cameraVideo');
+    video.srcObject = null;
+    document.getElementById('cameraModal').style.display = 'none';
+    document.querySelector('.camera-capture-btn').style.display = '';
+  }
+
+  document.getElementById('captureBtn').addEventListener('click', () => {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('cameraCanvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    document.getElementById('patientPhoto').src = dataUrl;
+    document.getElementById('patientPhotoWrap').style.display = '';
+    document.getElementById('cameraBtn').textContent = '📷 とりなおす';
+    closeCamera();
+  });
+
   // --- リセット ---
   document.getElementById('resetBtn').addEventListener('click', () => {
     document.getElementById('receptionNumber').textContent = generateReceptionNumber();
@@ -1199,6 +1380,9 @@
     clearResult('resultMedicine', 'しんだん まち…');
     clearResult('resultAdvice', 'しんだん まち…');
     clearResult('resultTest', 'けんさ まち…');
+    document.getElementById('patientPhoto').src = '';
+    document.getElementById('patientPhotoWrap').style.display = 'none';
+    document.getElementById('cameraBtn').textContent = '📷 しゃしんを とる';
     updateSummary();
   });
 </script>
