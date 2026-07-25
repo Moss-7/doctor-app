@@ -702,6 +702,68 @@
   }
   .camera-switch-btn:hover { background: #b3e5fc; }
 
+  /* ===== とくしゅ さつえい ===== */
+  .special-btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .xray-btn {
+    padding: 8px 18px;
+    border: 2px solid #b0bec5;
+    border-radius: 30px;
+    background: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    color: #455a64;
+    transition: all 0.2s ease;
+  }
+  .xray-btn:hover { background: #eceff1; }
+
+  .anime-btn {
+    padding: 8px 18px;
+    border: 2px solid #f48fb1;
+    border-radius: 30px;
+    background: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    color: #e91e63;
+    transition: all 0.2s ease;
+  }
+  .anime-btn:hover { background: #fce4ec; }
+
+  /* レントゲン結果ボックス */
+  .result-xray {
+    background: #0d1117;
+    border: 2px solid #30363d;
+  }
+  .result-xray h3 { color: #8ab4f8; }
+
+  .xray-image {
+    width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin-top: 6px;
+  }
+
+  /* アニメ結果ボックス */
+  .result-anime {
+    background: linear-gradient(135deg, #fff0f8, #f0f0ff);
+    border: 2px solid #f48fb1;
+  }
+  .result-anime h3 { color: #e91e63; }
+
+  .anime-image {
+    width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin-top: 6px;
+    image-rendering: crisp-edges;
+  }
+
   .patient-photo-wrap {
     text-align: center;
     margin-bottom: 10px;
@@ -1006,6 +1068,15 @@
         </div>
       </div>
 
+      <!-- とくしゅ さつえい -->
+      <div class="section">
+        <div class="section-title">📸 とくしゅ さつえい</div>
+        <div class="special-btns">
+          <button class="xray-btn" id="xrayBtn">🔬 レントゲン</button>
+          <button class="anime-btn" id="animeBtn">🎨 アニメ</button>
+        </div>
+      </div>
+
       <!-- しんだんボタン -->
       <button class="diagnose-btn" id="diagnoseBtn">🔍 しんだんする！</button>
     </div>
@@ -1049,6 +1120,14 @@
           <h3>🧪 けんさ けっか</h3>
           <div class="result-text empty" id="resultTest">けんさ まち…</div>
         </div>
+        <div class="result-box result-xray" id="xrayResultBox" style="display:none;">
+          <h3>🔬 レントゲン</h3>
+          <img class="xray-image" id="xrayImage" src="" alt="レントゲン しゃしん">
+        </div>
+        <div class="result-box result-anime" id="animeResultBox" style="display:none;">
+          <h3>🎨 アニメ かこう</h3>
+          <img class="anime-image" id="animeImage" src="" alt="アニメ かこう">
+        </div>
       </div>
 
       <button class="reset-btn" id="resetBtn">👋 つぎの かんじゃさん</button>
@@ -1060,7 +1139,7 @@
 <!-- カメラモーダル -->
 <div class="camera-modal" id="cameraModal" style="display:none;">
   <div class="camera-modal-inner">
-    <div class="camera-modal-title">📷 しゃしんを とるよ！</div>
+    <div class="camera-modal-title" id="cameraModalTitle">📷 しゃしんを とるよ！</div>
     <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
     <canvas id="cameraCanvas" style="display:none;"></canvas>
     <div class="camera-error" id="cameraError" style="display:none;"></div>
@@ -1315,8 +1394,22 @@
   // --- カメラ ---
   let cameraStream = null;
   let facingMode = 'environment';
+  let cameraMode = 'photo'; // 'photo' | 'xray' | 'anime'
 
-  document.getElementById('cameraBtn').addEventListener('click', openCamera);
+  document.getElementById('cameraBtn').addEventListener('click', () => {
+    cameraMode = 'photo';
+    openCamera('📷 しゃしんを とるよ！');
+  });
+
+  document.getElementById('xrayBtn').addEventListener('click', () => {
+    cameraMode = 'xray';
+    openCamera('🔬 レントゲン とるよ！');
+  });
+
+  document.getElementById('animeBtn').addEventListener('click', () => {
+    cameraMode = 'anime';
+    openCamera('🎨 アニメに するよ！');
+  });
 
   async function startStream() {
     const video = document.getElementById('cameraVideo');
@@ -1337,7 +1430,8 @@
     }
   }
 
-  async function openCamera() {
+  async function openCamera(title) {
+    document.getElementById('cameraModalTitle').textContent = title;
     facingMode = 'environment';
     document.getElementById('cameraModal').style.display = 'flex';
     await startStream();
@@ -1371,12 +1465,143 @@
     canvas.width = video.videoWidth || 640;
     canvas.height = video.videoHeight || 480;
     canvas.getContext('2d').drawImage(video, 0, 0);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    document.getElementById('patientPhoto').src = dataUrl;
-    document.getElementById('patientPhotoWrap').style.display = '';
-    document.getElementById('cameraBtn').textContent = '📷 とりなおす';
+
+    if (cameraMode === 'xray') {
+      applyXrayEffect(canvas);
+      document.getElementById('xrayImage').src = canvas.toDataURL('image/png');
+      document.getElementById('xrayResultBox').style.display = '';
+      document.getElementById('xrayBtn').textContent = '🔬 とりなおす';
+    } else if (cameraMode === 'anime') {
+      applyAnimeEffect(canvas);
+      document.getElementById('animeImage').src = canvas.toDataURL('image/png');
+      document.getElementById('animeResultBox').style.display = '';
+      document.getElementById('animeBtn').textContent = '🎨 とりなおす';
+    } else {
+      document.getElementById('patientPhoto').src = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('patientPhotoWrap').style.display = '';
+      document.getElementById('cameraBtn').textContent = '📷 とりなおす';
+    }
     closeCamera();
   });
+
+  function applyAnimeEffect(canvas) {
+    const ctx = canvas.getContext('2d');
+    const { width, height } = canvas;
+
+    // オリジナル画素を保存
+    const original = ctx.getImageData(0, 0, width, height);
+    const src = new Uint8ClampedArray(original.data);
+
+    // グレースケール（エッジ検出用）
+    const gray = new Float32Array(width * height);
+    for (let i = 0; i < width * height; i++) {
+      gray[i] = 0.299 * src[i * 4] + 0.587 * src[i * 4 + 1] + 0.114 * src[i * 4 + 2];
+    }
+
+    // Sobelエッジ検出
+    const edges = new Float32Array(width * height);
+    let maxEdge = 1;
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const idx = y * width + x;
+        const gx =
+          -gray[(y - 1) * width + (x - 1)] + gray[(y - 1) * width + (x + 1)]
+          - 2 * gray[y * width + (x - 1)] + 2 * gray[y * width + (x + 1)]
+          - gray[(y + 1) * width + (x - 1)] + gray[(y + 1) * width + (x + 1)];
+        const gy =
+          -gray[(y - 1) * width + (x - 1)] - 2 * gray[(y - 1) * width + x] - gray[(y - 1) * width + (x + 1)]
+          + gray[(y + 1) * width + (x - 1)] + 2 * gray[(y + 1) * width + x] + gray[(y + 1) * width + (x + 1)];
+        edges[idx] = Math.sqrt(gx * gx + gy * gy);
+        if (edges[idx] > maxEdge) maxEdge = edges[idx];
+      }
+    }
+
+    // 彩度強調＋ポスタライズ＋黒アウトライン合成
+    const result = ctx.createImageData(width, height);
+    const d = result.data;
+    const LEVELS = 5;
+    const STEP = 255 / (LEVELS - 1);
+    const EDGE_THRESH = 0.2;
+
+    for (let i = 0; i < width * height; i++) {
+      d[i * 4 + 3] = 255;
+      if ((edges[i] / maxEdge) > EDGE_THRESH) {
+        // エッジ → 黒アウトライン
+        d[i * 4] = 0; d[i * 4 + 1] = 0; d[i * 4 + 2] = 0;
+      } else {
+        // 彩度強調
+        const [h, s, l] = rgbToHsl(src[i * 4], src[i * 4 + 1], src[i * 4 + 2]);
+        let [r, g, b] = hslToRgb(h, Math.min(1, s * 2.2), l);
+        // ポスタライズ（平坦な色面）
+        d[i * 4]     = Math.round(Math.round(r / STEP) * STEP);
+        d[i * 4 + 1] = Math.round(Math.round(g / STEP) * STEP);
+        d[i * 4 + 2] = Math.round(Math.round(b / STEP) * STEP);
+      }
+    }
+    ctx.putImageData(result, 0, 0);
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+    return [h, s, l];
+  }
+
+  function hslToRgb(h, s, l) {
+    if (s === 0) { const v = Math.round(l * 255); return [v, v, v]; }
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    const hue2rgb = (t) => {
+      if (t < 0) t += 1; if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+    return [Math.round(hue2rgb(h + 1/3) * 255), Math.round(hue2rgb(h) * 255), Math.round(hue2rgb(h - 1/3) * 255)];
+  }
+
+  function applyXrayEffect(canvas) {
+    const ctx = canvas.getContext('2d');
+    const { width, height } = canvas;
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const d = imageData.data;
+
+    for (let i = 0; i < d.length; i += 4) {
+      // グレースケール変換
+      const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      // 色反転（明るい部分が骨っぽく白く）
+      const inv = 255 - gray;
+      // コントラスト強調
+      const c = Math.min(255, Math.max(0, (inv - 128) * 2.2 + 128));
+      // X線らしい青白い色調
+      d[i]     = Math.round(c * 0.68);  // R
+      d[i + 1] = Math.round(c * 0.85);  // G
+      d[i + 2] = Math.round(c);          // B
+    }
+    ctx.putImageData(imageData, 0, 0);
+
+    // ビネット（周辺減光）でX線フィルムらしさをプラス
+    const vignette = ctx.createRadialGradient(
+      width / 2, height / 2, height * 0.28,
+      width / 2, height / 2, height * 0.9
+    );
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.7)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, width, height);
+  }
 
   // --- リセット ---
   document.getElementById('resetBtn').addEventListener('click', () => {
@@ -1407,6 +1632,12 @@
     document.getElementById('patientPhoto').src = '';
     document.getElementById('patientPhotoWrap').style.display = 'none';
     document.getElementById('cameraBtn').textContent = '📷 しゃしんを とる';
+    document.getElementById('xrayImage').src = '';
+    document.getElementById('xrayResultBox').style.display = 'none';
+    document.getElementById('xrayBtn').textContent = '🔬 レントゲン';
+    document.getElementById('animeImage').src = '';
+    document.getElementById('animeResultBox').style.display = 'none';
+    document.getElementById('animeBtn').textContent = '🎨 アニメ';
     updateSummary();
   });
 </script>
