@@ -1432,20 +1432,54 @@
   const advicesNormal = ['きょうは はやく ねようね','おみずを たくさん のもうね','あったかく して やすんでね','だいじょうぶ！ すぐ げんきに なるよ','ゆっくり やすめば なおるよ','えいようの ある ごはんを たべようね'];
   const advicesSerious = ['しっかり おやすみ してね！ だいじょうぶ！','たくさん ねて たくさん たべてね！','おくすりを のんで ぐっすり ねようね！','あしたには げんきに なるよ！ やくそく！'];
 
-  const xrayDiagnoses = [
+  // 印なし → 正常
+  const xrayDiagNormal = [
     'ほねが きれいで とっても げんきだよ！ 🦴',
     'むねの なかが ぴかぴか して いるね！ ✨',
     'ほねが しっかり して いるよ！ すごいね 💪',
     'こころが げんきに うごいて いるね！ ❤️',
     'せぼねが まっすぐ で えらいね！ 🌟',
     'ほねの かたちが とっても きれいだよ！ 🌈',
-    'あたまの ほねが しっかり して いるね！ 💡',
-    'すこし かげが あるね。 おくすりで なおそう！ 💊',
-    'おなかに くうきが いっぱい あるね。 ゆっくり やすもう！ 🌬️',
-    'ほねが すくすく そだって いるね！ すてきだよ 🌱',
-    'むねが ひろくて げんきそう！ 😊',
-    'ほねに ちいさな かげが あるよ。 きをつけてね 👀',
+    'むねが ひろくて げんきそう！ すてきだよ 😊',
+    'ほねが すくすく そだって いるね！ 🌱',
   ];
+  // 印すくない → ひびの疑い
+  const xrayDiagLight = [
+    'ちいさな ひびが はいっているよ。すこし きをつけてね 🔍',
+    'ほねに うすい かげが あるね。ようすを みてみよう 👀',
+    'かすかな ひびを はっけん！ やさしく してあげてね 🩹',
+    'ここが すこし きになるよ。おくすりで なおそう 💊',
+    'うっすら ひびが はいってるね。むりを しないでね 🌡️',
+  ];
+  // 印ふつう → ひび確定
+  const xrayDiagModerate = [
+    'ひびが はいっているよ！ しっかり やすもうね ⚠️',
+    'ほねに ひびを はっけん！ ちゃんと てあてしよう 🩹',
+    'ここが ひびわれているね！ きをつけて うごいてね 🛏️',
+    'ひびが ふたつ あるよ！ ゆっくり なおそうね 💊',
+    'ほねが われそう！ じっと やすんでてね ❄️',
+  ];
+  // 印おおい → 骨折
+  const xrayDiagHeavy = [
+    'こっせつを はっけん！ すぐ てあてが ひつよう だよ！ 🚨',
+    'ほねが おれているよ！ ギプスを つけようね！ 🦴💥',
+    'おおきな こっせつ！ はやく てあてしてね！ 🏥',
+    'ほねが ふたつに なっているよ！ じっと してね 😲',
+    'こっせつ かくにん！ なおるまで しっかり やすんでね 🛌',
+  ];
+
+  function getDrawIntensity() {
+    const dc = document.getElementById('drawCanvas');
+    if (!dc.width) return 'normal';
+    const data = dc.getContext('2d').getImageData(0, 0, dc.width, dc.height).data;
+    let drawn = 0;
+    for (let i = 3; i < data.length; i += 4) { if (data[i] > 10) drawn++; }
+    const pct = drawn / (dc.width * dc.height);
+    if (pct === 0)     return 'normal';
+    if (pct < 0.003)   return 'light';
+    if (pct < 0.015)   return 'moderate';
+    return 'heavy';
+  }
 
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -1506,7 +1540,9 @@
     const xrayBox = document.getElementById('xrayResultBox');
     const xrayDiag = document.getElementById('xrayDiagnosis');
     if (xrayBox.style.display !== 'none') {
-      document.getElementById('xrayDiagText').textContent = pick(xrayDiagnoses);
+      const intensity = getDrawIntensity();
+      const diagPool = { normal: xrayDiagNormal, light: xrayDiagLight, moderate: xrayDiagModerate, heavy: xrayDiagHeavy };
+      document.getElementById('xrayDiagText').textContent = pick(diagPool[intensity]);
       xrayDiag.style.display = '';
       xrayDiag.style.animation = 'none'; void xrayDiag.offsetWidth; xrayDiag.style.animation = '';
     }
