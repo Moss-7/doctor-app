@@ -814,6 +814,26 @@
   }
   .draw-clear-btn:hover { background: rgba(239,83,80,0.15); }
 
+  .xray-diagnosis {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(138,180,248,0.08);
+    border: 1px solid rgba(138,180,248,0.3);
+    border-radius: 10px;
+    color: #c8d8f8;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.7;
+    animation: resultAppear 0.5s ease;
+  }
+
+  .xray-diag-label {
+    font-size: 12px;
+    color: rgba(138,180,248,0.6);
+    font-weight: normal;
+    margin-bottom: 4px;
+  }
+
   /* アニメ結果ボックス */
   .result-anime {
     background: linear-gradient(135deg, #fff0f8, #f0f0ff);
@@ -1202,6 +1222,10 @@
             <button class="draw-size-btn" data-size="14">太</button>
             <button class="draw-clear-btn" id="drawClearBtn">🗑 けす</button>
           </div>
+          <div class="xray-diagnosis" id="xrayDiagnosis" style="display:none;">
+            <div class="xray-diag-label">🩻 レントゲン しんだん</div>
+            <div id="xrayDiagText"></div>
+          </div>
         </div>
         <div class="result-box result-anime" id="animeResultBox" style="display:none;">
           <h3>🎨 アニメ かこう</h3>
@@ -1408,6 +1432,21 @@
   const advicesNormal = ['きょうは はやく ねようね','おみずを たくさん のもうね','あったかく して やすんでね','だいじょうぶ！ すぐ げんきに なるよ','ゆっくり やすめば なおるよ','えいようの ある ごはんを たべようね'];
   const advicesSerious = ['しっかり おやすみ してね！ だいじょうぶ！','たくさん ねて たくさん たべてね！','おくすりを のんで ぐっすり ねようね！','あしたには げんきに なるよ！ やくそく！'];
 
+  const xrayDiagnoses = [
+    'ほねが きれいで とっても げんきだよ！ 🦴',
+    'むねの なかが ぴかぴか して いるね！ ✨',
+    'ほねが しっかり して いるよ！ すごいね 💪',
+    'こころが げんきに うごいて いるね！ ❤️',
+    'せぼねが まっすぐ で えらいね！ 🌟',
+    'ほねの かたちが とっても きれいだよ！ 🌈',
+    'あたまの ほねが しっかり して いるね！ 💡',
+    'すこし かげが あるね。 おくすりで なおそう！ 💊',
+    'おなかに くうきが いっぱい あるね。 ゆっくり やすもう！ 🌬️',
+    'ほねが すくすく そだって いるね！ すてきだよ 🌱',
+    'むねが ひろくて げんきそう！ 😊',
+    'ほねに ちいさな かげが あるよ。 きをつけてね 👀',
+  ];
+
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
   function setResult(id, text) {
@@ -1461,6 +1500,15 @@
       testBox.style.display = '';
     } else {
       testBox.style.display = 'none';
+    }
+
+    // レントゲン診断結果
+    const xrayBox = document.getElementById('xrayResultBox');
+    const xrayDiag = document.getElementById('xrayDiagnosis');
+    if (xrayBox.style.display !== 'none') {
+      document.getElementById('xrayDiagText').textContent = pick(xrayDiagnoses);
+      xrayDiag.style.display = '';
+      xrayDiag.style.animation = 'none'; void xrayDiag.offsetWidth; xrayDiag.style.animation = '';
     }
 
     // モバイルのみ：結果パネルへ自動スクロール
@@ -1549,6 +1597,7 @@
       applyXrayEffect(canvas);
       document.getElementById('xrayImage').src = canvas.toDataURL('image/png');
       document.getElementById('xrayResultBox').style.display = '';
+      document.getElementById('xrayDiagnosis').style.display = 'none';
       document.getElementById('xrayBtn').textContent = '🔬 とりなおす';
       initDrawCanvas(canvas.width, canvas.height);
     } else if (cameraMode === 'anime') {
@@ -1785,6 +1834,8 @@
     document.getElementById('cameraBtn').textContent = '📷 しゃしんを とる';
     document.getElementById('xrayImage').src = '';
     document.getElementById('xrayResultBox').style.display = 'none';
+    document.getElementById('xrayDiagnosis').style.display = 'none';
+    document.getElementById('xrayDiagText').textContent = '';
     document.getElementById('xrayBtn').textContent = '🔬 レントゲン';
     const dc = document.getElementById('drawCanvas');
     dc.getContext('2d').clearRect(0, 0, dc.width, dc.height);
