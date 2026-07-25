@@ -742,11 +742,96 @@
   }
   .result-xray h3 { color: #8ab4f8; }
 
+  .xray-draw-wrap {
+    position: relative;
+    margin-top: 6px;
+  }
+
   .xray-image {
     width: 100%;
     border-radius: 8px;
     display: block;
-    margin-top: 6px;
+  }
+
+  .draw-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .draw-toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .draw-color-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.25);
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+  .draw-color-btn[data-color="#ffffff"] { background: #ffffff; }
+  .draw-color-btn[data-color="#ff5555"] { background: #ff5555; }
+  .draw-color-btn[data-color="#ffff00"] { background: #ffff00; }
+  .draw-color-btn[data-color="#00ff88"] { background: #00ff88; }
+  .draw-color-btn.active { border-color: #8ab4f8; box-shadow: 0 0 0 2px #8ab4f8; transform: scale(1.2); }
+
+  .draw-sep { flex: 1; }
+
+  .draw-size-btn {
+    padding: 3px 10px;
+    border: 1px solid #8ab4f8;
+    border-radius: 20px;
+    background: transparent;
+    color: #8ab4f8;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .draw-size-btn.active { background: #8ab4f8; color: #0d1117; }
+
+  .draw-clear-btn {
+    padding: 3px 10px;
+    border: 1px solid #ef5350;
+    border-radius: 20px;
+    background: transparent;
+    color: #ef5350;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .draw-clear-btn:hover { background: rgba(239,83,80,0.15); }
+
+  .xray-diagnosis {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(138,180,248,0.08);
+    border: 1px solid rgba(138,180,248,0.3);
+    border-radius: 10px;
+    color: #c8d8f8;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.7;
+    animation: resultAppear 0.5s ease;
+  }
+
+  .xray-diag-label {
+    font-size: 12px;
+    color: rgba(138,180,248,0.6);
+    font-weight: normal;
+    margin-bottom: 4px;
   }
 
   /* アニメ結果ボックス */
@@ -1122,7 +1207,25 @@
         </div>
         <div class="result-box result-xray" id="xrayResultBox" style="display:none;">
           <h3>🔬 レントゲン</h3>
-          <img class="xray-image" id="xrayImage" src="" alt="レントゲン しゃしん">
+          <div class="xray-draw-wrap">
+            <img class="xray-image" id="xrayImage" src="" alt="レントゲン しゃしん">
+            <canvas id="drawCanvas" class="draw-canvas"></canvas>
+          </div>
+          <div class="draw-toolbar" id="drawToolbar">
+            <button class="draw-color-btn active" data-color="#ffffff"></button>
+            <button class="draw-color-btn" data-color="#ff5555"></button>
+            <button class="draw-color-btn" data-color="#ffff00"></button>
+            <button class="draw-color-btn" data-color="#00ff88"></button>
+            <div class="draw-sep"></div>
+            <button class="draw-size-btn active" data-size="3">細</button>
+            <button class="draw-size-btn" data-size="7">中</button>
+            <button class="draw-size-btn" data-size="14">太</button>
+            <button class="draw-clear-btn" id="drawClearBtn">🗑 けす</button>
+          </div>
+          <div class="xray-diagnosis" id="xrayDiagnosis" style="display:none;">
+            <div class="xray-diag-label">🩻 レントゲン しんだん</div>
+            <div id="xrayDiagText"></div>
+          </div>
         </div>
         <div class="result-box result-anime" id="animeResultBox" style="display:none;">
           <h3>🎨 アニメ かこう</h3>
@@ -1329,6 +1432,21 @@
   const advicesNormal = ['きょうは はやく ねようね','おみずを たくさん のもうね','あったかく して やすんでね','だいじょうぶ！ すぐ げんきに なるよ','ゆっくり やすめば なおるよ','えいようの ある ごはんを たべようね'];
   const advicesSerious = ['しっかり おやすみ してね！ だいじょうぶ！','たくさん ねて たくさん たべてね！','おくすりを のんで ぐっすり ねようね！','あしたには げんきに なるよ！ やくそく！'];
 
+  const xrayDiagnoses = [
+    'ほねが きれいで とっても げんきだよ！ 🦴',
+    'むねの なかが ぴかぴか して いるね！ ✨',
+    'ほねが しっかり して いるよ！ すごいね 💪',
+    'こころが げんきに うごいて いるね！ ❤️',
+    'せぼねが まっすぐ で えらいね！ 🌟',
+    'ほねの かたちが とっても きれいだよ！ 🌈',
+    'あたまの ほねが しっかり して いるね！ 💡',
+    'すこし かげが あるね。 おくすりで なおそう！ 💊',
+    'おなかに くうきが いっぱい あるね。 ゆっくり やすもう！ 🌬️',
+    'ほねが すくすく そだって いるね！ すてきだよ 🌱',
+    'むねが ひろくて げんきそう！ 😊',
+    'ほねに ちいさな かげが あるよ。 きをつけてね 👀',
+  ];
+
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
   function setResult(id, text) {
@@ -1382,6 +1500,15 @@
       testBox.style.display = '';
     } else {
       testBox.style.display = 'none';
+    }
+
+    // レントゲン診断結果
+    const xrayBox = document.getElementById('xrayResultBox');
+    const xrayDiag = document.getElementById('xrayDiagnosis');
+    if (xrayBox.style.display !== 'none') {
+      document.getElementById('xrayDiagText').textContent = pick(xrayDiagnoses);
+      xrayDiag.style.display = '';
+      xrayDiag.style.animation = 'none'; void xrayDiag.offsetWidth; xrayDiag.style.animation = '';
     }
 
     // モバイルのみ：結果パネルへ自動スクロール
@@ -1470,7 +1597,9 @@
       applyXrayEffect(canvas);
       document.getElementById('xrayImage').src = canvas.toDataURL('image/png');
       document.getElementById('xrayResultBox').style.display = '';
+      document.getElementById('xrayDiagnosis').style.display = 'none';
       document.getElementById('xrayBtn').textContent = '🔬 とりなおす';
+      initDrawCanvas(canvas.width, canvas.height);
     } else if (cameraMode === 'anime') {
       applyAnimeEffect(canvas);
       document.getElementById('animeImage').src = canvas.toDataURL('image/png');
@@ -1483,6 +1612,77 @@
     }
     closeCamera();
   });
+
+  // --- レントゲン 手書きアノテーション ---
+  let drawColor = '#ffffff';
+  let drawSize = 3;
+  let isDrawing = false;
+  let lastDrawX = 0, lastDrawY = 0;
+
+  function initDrawCanvas(w, h) {
+    const dc = document.getElementById('drawCanvas');
+    dc.width = w;
+    dc.height = h;
+    dc.getContext('2d').clearRect(0, 0, w, h);
+  }
+
+  document.getElementById('drawToolbar').addEventListener('click', (e) => {
+    const colorBtn = e.target.closest('.draw-color-btn');
+    if (colorBtn) {
+      document.querySelectorAll('.draw-color-btn').forEach(b => b.classList.remove('active'));
+      colorBtn.classList.add('active');
+      drawColor = colorBtn.dataset.color;
+      return;
+    }
+    const sizeBtn = e.target.closest('.draw-size-btn');
+    if (sizeBtn) {
+      document.querySelectorAll('.draw-size-btn').forEach(b => b.classList.remove('active'));
+      sizeBtn.classList.add('active');
+      drawSize = Number(sizeBtn.dataset.size);
+      return;
+    }
+    if (e.target.closest('#drawClearBtn')) {
+      const dc = document.getElementById('drawCanvas');
+      dc.getContext('2d').clearRect(0, 0, dc.width, dc.height);
+    }
+  });
+
+  const drawCanvas = document.getElementById('drawCanvas');
+
+  function getDrawPos(e) {
+    const rect = drawCanvas.getBoundingClientRect();
+    const sx = drawCanvas.width / rect.width;
+    const sy = drawCanvas.height / rect.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - rect.left) * sx, y: (src.clientY - rect.top) * sy };
+  }
+
+  drawCanvas.addEventListener('pointerdown', (e) => {
+    isDrawing = true;
+    const pos = getDrawPos(e);
+    lastDrawX = pos.x; lastDrawY = pos.y;
+    drawCanvas.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  drawCanvas.addEventListener('pointermove', (e) => {
+    if (!isDrawing) return;
+    const ctx = drawCanvas.getContext('2d');
+    const pos = getDrawPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastDrawX, lastDrawY);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = drawColor;
+    ctx.lineWidth = drawSize;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    lastDrawX = pos.x; lastDrawY = pos.y;
+    e.preventDefault();
+  });
+
+  drawCanvas.addEventListener('pointerup', () => { isDrawing = false; });
+  drawCanvas.addEventListener('pointercancel', () => { isDrawing = false; });
 
   function applyAnimeEffect(canvas) {
     const ctx = canvas.getContext('2d');
@@ -1634,7 +1834,11 @@
     document.getElementById('cameraBtn').textContent = '📷 しゃしんを とる';
     document.getElementById('xrayImage').src = '';
     document.getElementById('xrayResultBox').style.display = 'none';
+    document.getElementById('xrayDiagnosis').style.display = 'none';
+    document.getElementById('xrayDiagText').textContent = '';
     document.getElementById('xrayBtn').textContent = '🔬 レントゲン';
+    const dc = document.getElementById('drawCanvas');
+    dc.getContext('2d').clearRect(0, 0, dc.width, dc.height);
     document.getElementById('animeImage').src = '';
     document.getElementById('animeResultBox').style.display = 'none';
     document.getElementById('animeBtn').textContent = '🎨 アニメ';
