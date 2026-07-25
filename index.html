@@ -702,6 +702,34 @@
   }
   .camera-switch-btn:hover { background: #b3e5fc; }
 
+  /* ===== レントゲンボタン ===== */
+  .xray-btn {
+    padding: 8px 18px;
+    border: 2px solid #b0bec5;
+    border-radius: 30px;
+    background: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    color: #455a64;
+    transition: all 0.2s ease;
+  }
+  .xray-btn:hover { background: #eceff1; }
+
+  /* レントゲン結果ボックス */
+  .result-xray {
+    background: #0d1117;
+    border: 2px solid #30363d;
+  }
+  .result-xray h3 { color: #8ab4f8; }
+
+  .xray-image {
+    width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin-top: 6px;
+  }
+
   .patient-photo-wrap {
     text-align: center;
     margin-bottom: 10px;
@@ -1006,6 +1034,12 @@
         </div>
       </div>
 
+      <!-- レントゲン -->
+      <div class="section">
+        <div class="section-title">🔬 レントゲン</div>
+        <button class="xray-btn" id="xrayBtn">🔬 レントゲンを とる</button>
+      </div>
+
       <!-- しんだんボタン -->
       <button class="diagnose-btn" id="diagnoseBtn">🔍 しんだんする！</button>
     </div>
@@ -1049,6 +1083,10 @@
           <h3>🧪 けんさ けっか</h3>
           <div class="result-text empty" id="resultTest">けんさ まち…</div>
         </div>
+        <div class="result-box result-xray" id="xrayResultBox" style="display:none;">
+          <h3>🔬 レントゲン</h3>
+          <img class="xray-image" id="xrayImage" src="" alt="レントゲン しゃしん">
+        </div>
       </div>
 
       <button class="reset-btn" id="resetBtn">👋 つぎの かんじゃさん</button>
@@ -1060,7 +1098,7 @@
 <!-- カメラモーダル -->
 <div class="camera-modal" id="cameraModal" style="display:none;">
   <div class="camera-modal-inner">
-    <div class="camera-modal-title">📷 しゃしんを とるよ！</div>
+    <div class="camera-modal-title" id="cameraModalTitle">📷 しゃしんを とるよ！</div>
     <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
     <canvas id="cameraCanvas" style="display:none;"></canvas>
     <div class="camera-error" id="cameraError" style="display:none;"></div>
@@ -1315,8 +1353,17 @@
   // --- カメラ ---
   let cameraStream = null;
   let facingMode = 'environment';
+  let isXrayMode = false;
 
-  document.getElementById('cameraBtn').addEventListener('click', openCamera);
+  document.getElementById('cameraBtn').addEventListener('click', () => {
+    isXrayMode = false;
+    openCamera('📷 しゃしんを とるよ！');
+  });
+
+  document.getElementById('xrayBtn').addEventListener('click', () => {
+    isXrayMode = true;
+    openCamera('🔬 レントゲン とるよ！');
+  });
 
   async function startStream() {
     const video = document.getElementById('cameraVideo');
@@ -1337,7 +1384,8 @@
     }
   }
 
-  async function openCamera() {
+  async function openCamera(title) {
+    document.getElementById('cameraModalTitle').textContent = title;
     facingMode = 'environment';
     document.getElementById('cameraModal').style.display = 'flex';
     await startStream();
@@ -1371,12 +1419,50 @@
     canvas.width = video.videoWidth || 640;
     canvas.height = video.videoHeight || 480;
     canvas.getContext('2d').drawImage(video, 0, 0);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    document.getElementById('patientPhoto').src = dataUrl;
-    document.getElementById('patientPhotoWrap').style.display = '';
-    document.getElementById('cameraBtn').textContent = '📷 とりなおす';
+
+    if (isXrayMode) {
+      applyXrayEffect(canvas);
+      document.getElementById('xrayImage').src = canvas.toDataURL('image/png');
+      document.getElementById('xrayResultBox').style.display = '';
+      document.getElementById('xrayBtn').textContent = '🔬 とりなおす';
+    } else {
+      document.getElementById('patientPhoto').src = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('patientPhotoWrap').style.display = '';
+      document.getElementById('cameraBtn').textContent = '📷 とりなおす';
+    }
     closeCamera();
   });
+
+  function applyXrayEffect(canvas) {
+    const ctx = canvas.getContext('2d');
+    const { width, height } = canvas;
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const d = imageData.data;
+
+    for (let i = 0; i < d.length; i += 4) {
+      // グレースケール変換
+      const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      // 色反転（明るい部分が骨っぽく白く）
+      const inv = 255 - gray;
+      // コントラスト強調
+      const c = Math.min(255, Math.max(0, (inv - 128) * 2.2 + 128));
+      // X線らしい青白い色調
+      d[i]     = Math.round(c * 0.68);  // R
+      d[i + 1] = Math.round(c * 0.85);  // G
+      d[i + 2] = Math.round(c);          // B
+    }
+    ctx.putImageData(imageData, 0, 0);
+
+    // ビネット（周辺減光）でX線フィルムらしさをプラス
+    const vignette = ctx.createRadialGradient(
+      width / 2, height / 2, height * 0.28,
+      width / 2, height / 2, height * 0.9
+    );
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.7)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, width, height);
+  }
 
   // --- リセット ---
   document.getElementById('resetBtn').addEventListener('click', () => {
@@ -1407,6 +1493,9 @@
     document.getElementById('patientPhoto').src = '';
     document.getElementById('patientPhotoWrap').style.display = 'none';
     document.getElementById('cameraBtn').textContent = '📷 しゃしんを とる';
+    document.getElementById('xrayImage').src = '';
+    document.getElementById('xrayResultBox').style.display = 'none';
+    document.getElementById('xrayBtn').textContent = '🔬 レントゲンを とる';
     updateSummary();
   });
 </script>
