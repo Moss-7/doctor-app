@@ -1172,32 +1172,67 @@
   .admin-tools #adminClearBtn { border-color: #ef9a9a; color: #c62828; }
   .admin-tools #adminClearBtn:hover { background: #ffebee; }
 
-  /* ===== いんさつ ===== */
+  /* ===== いんさつ（しんさつけん 1まいだけ）===== */
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
   @media print {
-    body { background: #fff; padding: 0; }
+    /* height:100% と min-height:100vh が のこると
+       ページの たかさぶん からの 2まいめが できてしまう */
+    html, body {
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+      overflow: visible !important;
+    }
+
     body > *:not(#cardModal) { display: none !important; }
+
     #cardModal {
       display: block !important;
       position: static !important;
-      inset: auto;
-      background: none;
-      padding: 0;
-      overflow: visible;
+      inset: auto !important;
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: none !important;
+      overflow: visible !important;
     }
+
     .card-modal-inner {
-      display: block;
-      max-width: none;
-      padding: 0;
-      background: none;
-      border-radius: 0;
+      display: block !important;
+      width: auto !important;
+      max-width: none !important;
+      height: auto !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      background: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
     }
+
+    /* 「できたよ！」の みだしと ボタンは いんさつ しない */
+    #cardModal .camera-modal-title,
     .card-actions { display: none !important; }
+
     .ticket {
-      box-shadow: none;
+      margin: 0 !important;
+      box-shadow: none !important;
       border: 1.5px solid #999;
+      background: #fff !important;
       page-break-inside: avoid;
-      background: #fff;
+      break-inside: avoid;
+      page-break-after: avoid;
+      break-after: avoid;
     }
+    /* さいごの ようそが よぶんな かいページを つくらないように */
+    .ticket::after { content: none !important; }
   }
 
   /* ===========================
@@ -1663,7 +1698,7 @@
 <script>
   // --- バージョン情報 ---
   // ★ 変更するたびに ここを 更新する
-  const APP_VERSION = 'v1.7.0';
+  const APP_VERSION = 'v1.7.1';
   const APP_UPDATED = '2026-08-11';
   document.getElementById('versionBadge').textContent = APP_VERSION + ' · ' + APP_UPDATED;
 
