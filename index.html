@@ -62,9 +62,25 @@
     opacity: 0.7;
   }
 
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
   .lamps {
     display: flex;
     gap: 8px;
+  }
+
+  .version-badge {
+    font-size: 11px;
+    font-weight: bold;
+    color: #ad1457;
+    opacity: 0.5;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
   }
 
   .lamp {
@@ -932,6 +948,10 @@
       height: 18px;
     }
 
+    .version-badge {
+      font-size: 9px;
+    }
+
     /* 患者情報グリッド：4列→2列 */
     .patient-grid {
       grid-template-columns: auto 1fr;
@@ -1031,15 +1051,18 @@
       <h1>🏥 でんしカルテ</h1>
       <span class="key-hint">⌨ キーボードを おすと ランプが ひかるよ！</span>
     </div>
-    <div class="lamps" id="lamps">
-      <div class="lamp"></div>
-      <div class="lamp"></div>
-      <div class="lamp"></div>
-      <div class="lamp"></div>
-      <div class="lamp"></div>
-      <div class="lamp"></div>
-      <div class="lamp"></div>
-      <div class="lamp"></div>
+    <div class="header-right">
+      <div class="lamps" id="lamps">
+        <div class="lamp"></div>
+        <div class="lamp"></div>
+        <div class="lamp"></div>
+        <div class="lamp"></div>
+        <div class="lamp"></div>
+        <div class="lamp"></div>
+        <div class="lamp"></div>
+        <div class="lamp"></div>
+      </div>
+      <span class="version-badge" id="versionBadge"></span>
     </div>
   </div>
 
@@ -1255,6 +1278,12 @@
 </div>
 
 <script>
+  // --- バージョン情報 ---
+  // ★ 変更するたびに ここを 更新する
+  const APP_VERSION = 'v1.5.0';
+  const APP_UPDATED = '2026-08-11';
+  document.getElementById('versionBadge').textContent = APP_VERSION + ' · ' + APP_UPDATED;
+
   // --- 状態管理 ---
   const state = {
     selectedParts: {},
