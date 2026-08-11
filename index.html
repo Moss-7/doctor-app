@@ -1056,32 +1056,183 @@
   .recall-item .rc-sub { font-size: 12px; color: #999; }
   .recall-empty { font-size: 14px; color: #aaa; text-align: center; padding: 16px; }
 
-  /* ===== いんさつ ===== */
+  /* ===== かんり がめん ===== */
+  .card-admin-btn {
+    padding: 8px 16px;
+    border: 2px solid #cfd8dc;
+    border-radius: 30px;
+    background: #fff;
+    color: #607d8b;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .card-admin-btn:hover { background: #eceff1; }
+
+  .admin-storage {
+    font-size: 13px;
+    color: #78909c;
+    background: #eceff1;
+    border-radius: 20px;
+    padding: 4px 14px;
+  }
+
+  .admin-list {
+    width: 100%;
+    max-height: 46vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .admin-item {
+    border: 2px solid #eceff1;
+    border-radius: 12px;
+    padding: 10px;
+    background: #fff;
+  }
+
+  .admin-row { display: flex; align-items: center; gap: 10px; }
+
+  .admin-photo {
+    width: 42px; height: 42px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+    border: 2px solid #f8bbd0;
+  }
+  .admin-photo-none {
+    display: flex; align-items: center; justify-content: center;
+    background: #f5f5f5; font-size: 20px; border-color: #e0e0e0;
+  }
+
+  .admin-info { flex: 1; min-width: 0; }
+  .admin-name { font-size: 15px; font-weight: bold; color: #5d4037; }
+  .admin-meta { font-size: 12px; color: #90a4ae; margin-top: 1px; }
+
+  .admin-btns { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+
+  .admin-edit-btn, .admin-del-btn {
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    background: #fff;
+  }
+  .admin-edit-btn { border: 1px solid #4fc3f7; color: #0277bd; }
+  .admin-edit-btn:hover { background: #e1f5fe; }
+  .admin-del-btn { border: 1px solid #ef9a9a; color: #c62828; }
+  .admin-del-btn:hover { background: #ffebee; }
+
+  .admin-edit-form {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #cfd8dc;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+  }
+  .admin-edit-form label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .admin-edit-form input[type="text"],
+  .admin-edit-form input[type="date"] {
+    flex: 1;
+    min-width: 140px;
+    padding: 5px 10px;
+    border: 2px solid #f8bbd0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+  }
+  .admin-edit-form .ae-gender { display: flex; gap: 12px; }
+  .admin-edit-form .ae-gender label { font-size: 14px; }
+  .ae-btns { display: flex; gap: 8px; justify-content: flex-end; }
+  .ae-save, .ae-cancel {
+    padding: 6px 16px; border-radius: 20px; font-size: 14px;
+    font-family: inherit; cursor: pointer;
+  }
+  .ae-save { border: none; background: #4fc3f7; color: #fff; font-weight: bold; }
+  .ae-cancel { border: 1px solid #ccc; background: #fff; color: #777; }
+
+  .admin-tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .admin-tools button {
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #b0bec5;
+    color: #546e7a;
+  }
+  .admin-tools button:hover { background: #eceff1; }
+  .admin-tools #adminClearBtn { border-color: #ef9a9a; color: #c62828; }
+  .admin-tools #adminClearBtn:hover { background: #ffebee; }
+
+  /* ===== いんさつ（しんさつけん 1まいだけ）===== */
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
   @media print {
-    body { background: #fff; padding: 0; }
+    /* height:100% と min-height:100vh が のこると
+       ページの たかさぶん からの 2まいめが できてしまう */
+    html, body {
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+      overflow: visible !important;
+    }
+
     body > *:not(#cardModal) { display: none !important; }
+
     #cardModal {
       display: block !important;
       position: static !important;
-      inset: auto;
-      background: none;
-      padding: 0;
-      overflow: visible;
+      inset: auto !important;
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: none !important;
+      overflow: visible !important;
     }
+
     .card-modal-inner {
-      display: block;
-      max-width: none;
-      padding: 0;
-      background: none;
-      border-radius: 0;
+      display: block !important;
+      width: auto !important;
+      max-width: none !important;
+      height: auto !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      background: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
     }
+
+    /* 「できたよ！」の みだしと ボタンは いんさつ しない */
+    #cardModal .camera-modal-title,
     .card-actions { display: none !important; }
+
     .ticket {
-      box-shadow: none;
+      margin: 0 !important;
+      box-shadow: none !important;
       border: 1.5px solid #999;
+      background: #fff !important;
       page-break-inside: avoid;
-      background: #fff;
+      break-inside: avoid;
+      page-break-after: avoid;
+      break-after: avoid;
     }
+    /* さいごの ようそが よぶんな かいページを つくらないように */
+    .ticket::after { content: none !important; }
   }
 
   /* ===========================
@@ -1299,6 +1450,7 @@
           <button class="camera-btn" id="cameraBtn">📷 しゃしんを とる</button>
           <button class="card-make-btn" id="makeCardBtn">🎫 しんさつけんを つくる</button>
           <button class="card-load-btn" id="loadCardBtn">🔍 しんさつけんで よびだす</button>
+          <button class="card-admin-btn" id="adminBtn">⚙ かんり</button>
         </div>
       </div>
 
@@ -1512,6 +1664,22 @@
   </div>
 </div>
 
+<!-- しんさつけん かんりモーダル -->
+<div class="card-modal" id="adminModal" style="display:none;">
+  <div class="card-modal-inner">
+    <div class="camera-modal-title">⚙ しんさつけんの かんり</div>
+    <div class="admin-storage" id="adminStorage"></div>
+    <div class="admin-list" id="adminList"></div>
+    <div class="admin-tools">
+      <button id="adminExportBtn">💾 バックアップ</button>
+      <button id="adminImportBtn">📂 よみこみ</button>
+      <button id="adminClearBtn">🗑 ぜんぶ けす</button>
+    </div>
+    <input type="file" id="adminImportFile" accept="application/json,.json" style="display:none;">
+    <button class="camera-close-btn" id="adminCloseBtn">✕ とじる</button>
+  </div>
+</div>
+
 <!-- カメラモーダル -->
 <div class="camera-modal" id="cameraModal" style="display:none;">
   <div class="camera-modal-inner">
@@ -1530,7 +1698,7 @@
 <script>
   // --- バージョン情報 ---
   // ★ 変更するたびに ここを 更新する
-  const APP_VERSION = 'v1.6.0';
+  const APP_VERSION = 'v1.7.1';
   const APP_UPDATED = '2026-08-11';
   document.getElementById('versionBadge').textContent = APP_VERSION + ' · ' + APP_UPDATED;
 
@@ -2696,6 +2864,204 @@
   document.getElementById('recallCloseBtn').addEventListener('click', closeRecall);
   document.getElementById('recallModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('recallModal')) closeRecall();
+  });
+
+  // ===== しんさつけんの かんり がめん =====
+  document.getElementById('adminBtn').addEventListener('click', () => {
+    renderAdminList();
+    document.getElementById('adminModal').style.display = 'flex';
+  });
+  document.getElementById('adminCloseBtn').addEventListener('click', closeAdmin);
+  document.getElementById('adminModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('adminModal')) closeAdmin();
+  });
+  function closeAdmin() { document.getElementById('adminModal').style.display = 'none'; }
+
+  function storageInfo() {
+    const raw = localStorage.getItem(CARD_STORE) || '';
+    const bytes = new Blob([raw]).size;
+    const n = Object.keys(loadPatients()).length;
+    const size = bytes < 1024 ? bytes + ' B' : (bytes / 1024).toFixed(1) + ' KB';
+    return n + 'にん とうろく ちゅう　／　つかって いる ようりょう ' + size;
+  }
+
+  function renderAdminList() {
+    const patients = loadPatients();
+    const list = document.getElementById('adminList');
+    document.getElementById('adminStorage').textContent = storageInfo();
+    const ids = Object.keys(patients).sort();
+    list.innerHTML = '';
+    if (!ids.length) {
+      list.innerHTML = '<div class="recall-empty">まだ しんさつけんが ありません</div>';
+      return;
+    }
+    ids.forEach(id => {
+      const p = patients[id];
+      const last = (p.history && p.history.length) ? p.history[p.history.length - 1] : null;
+      const item = document.createElement('div');
+      item.className = 'admin-item';
+      item.dataset.id = id;
+
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+      row.innerHTML =
+        (p.photo ? '<img class="admin-photo" alt="">' : '<div class="admin-photo admin-photo-none">👤</div>') +
+        '<div class="admin-info">' +
+          '<div class="admin-name"><span class="rc-no">' + escapeHtml(p.id) + '</span> ' +
+            escapeHtml(p.name || '（なまえ なし）') + '</div>' +
+          '<div class="admin-meta">' + escapeHtml(genderLabel(p.gender)) + '　' +
+            escapeHtml(birthdayLabel(p.birthday)) + '</div>' +
+          '<div class="admin-meta">はっこう ' + escapeHtml(p.issued || 'ー') + '　じゅしん ' +
+            ((p.history && p.history.length) || 0) + 'かい' +
+            (last ? '（まえかい ' + escapeHtml(last.diagnosis) + '）' : '') + '</div>' +
+        '</div>' +
+        '<div class="admin-btns">' +
+          '<button class="admin-edit-btn">✏️ なおす</button>' +
+          '<button class="admin-del-btn">🗑 けす</button>' +
+        '</div>';
+      if (p.photo) row.querySelector('.admin-photo').src = p.photo;
+      item.appendChild(row);
+
+      const form = document.createElement('div');
+      form.className = 'admin-edit-form';
+      form.style.display = 'none';
+      form.innerHTML =
+        '<label>なまえ<input type="text" class="ae-name"></label>' +
+        '<label>せいべつ<span class="ae-gender">' +
+          '<label><input type="radio" value="boy"> おとこのこ</label>' +
+          '<label><input type="radio" value="girl"> おんなのこ</label>' +
+        '</span></label>' +
+        '<label>たんじょうび<input type="date" class="ae-bday" min="2019-01-01" max="2026-12-31"></label>' +
+        (p.photo ? '<label><input type="checkbox" class="ae-delphoto"> しゃしんを けす</label>' : '') +
+        '<div class="ae-btns"><button class="ae-cancel">やめる</button><button class="ae-save">💾 ほぞん</button></div>';
+      form.querySelector('.ae-name').value = p.name || '';
+      form.querySelector('.ae-bday').value = p.birthday || '';
+      form.querySelectorAll('.ae-gender input').forEach(r => {
+        r.name = 'ae-gender-' + id;
+        r.checked = (r.value === p.gender);
+      });
+      item.appendChild(form);
+      list.appendChild(item);
+    });
+  }
+
+  document.getElementById('adminList').addEventListener('click', (e) => {
+    const item = e.target.closest('.admin-item');
+    if (!item) return;
+    const id = item.dataset.id;
+    const form = item.querySelector('.admin-edit-form');
+
+    if (e.target.closest('.admin-edit-btn')) {
+      const open = form.style.display !== 'none';
+      form.style.display = open ? 'none' : '';
+      return;
+    }
+    if (e.target.closest('.ae-cancel')) { renderAdminList(); return; }
+
+    if (e.target.closest('.admin-del-btn')) {
+      const patients = loadPatients();
+      const p = patients[id];
+      if (!p) return;
+      if (!confirm('「' + (p.name || id) + '」の しんさつけんを けしますか？\nもとに もどせません。')) return;
+      delete patients[id];
+      savePatients(patients);
+      if (state.currentCardId === id) state.currentCardId = null;
+      renderAdminList();
+      return;
+    }
+
+    if (e.target.closest('.ae-save')) {
+      const name = form.querySelector('.ae-name').value.trim();
+      if (!name) { alert('なまえを いれてね！'); return; }
+      const patients = loadPatients();
+      const p = patients[id];
+      if (!p) return;
+      p.name = name;
+      const g = form.querySelector('.ae-gender input:checked');
+      p.gender = g ? g.value : '';
+      p.birthday = form.querySelector('.ae-bday').value;
+      const del = form.querySelector('.ae-delphoto');
+      if (del && del.checked) p.photo = '';
+      if (!savePatients(patients)) { alert('ほぞん できませんでした（ようりょう オーバー）'); return; }
+      // いま よみこんで いる かんじゃさんなら にゅうりょくらんも あわせて こうしん
+      if (state.currentCardId === id) {
+        document.getElementById('patientName').value = p.name;
+        document.querySelectorAll('input[name="gender"]').forEach(r => { r.checked = (r.value === p.gender); });
+        document.getElementById('birthDate').value = p.birthday || '';
+        if (!p.photo) {
+          document.getElementById('patientPhoto').removeAttribute('src');
+          document.getElementById('patientPhotoWrap').style.display = 'none';
+          document.getElementById('cameraBtn').textContent = '📷 しゃしんを とる';
+        }
+        updateSummary();
+      }
+      renderAdminList();
+    }
+  });
+
+  // --- ぜんぶ けす ---
+  document.getElementById('adminClearBtn').addEventListener('click', () => {
+    const n = Object.keys(loadPatients()).length;
+    if (!n) return;
+    if (!confirm('とうろく されて いる ' + n + 'にん ぜんいんの しんさつけんを けしますか？\nもとに もどせません。')) return;
+    localStorage.removeItem(CARD_STORE);
+    state.currentCardId = null;
+    renderAdminList();
+  });
+
+  // --- バックアップ（かきだし）---
+  document.getElementById('adminExportBtn').addEventListener('click', () => {
+    const data = localStorage.getItem(CARD_STORE) || '{}';
+    const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'shinsatsuken-backup.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  // --- よみこみ ---
+  document.getElementById('adminImportBtn').addEventListener('click', () => {
+    document.getElementById('adminImportFile').click();
+  });
+  document.getElementById('adminImportFile').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let obj;
+      try { obj = JSON.parse(reader.result); } catch (err) { alert('ファイルを よみこめませんでした'); return; }
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) { alert('ファイルの かたちが ちがいます'); return; }
+      const cleaned = {};
+      Object.keys(obj).forEach(k => {
+        const p = obj[k];
+        if (!p || typeof p !== 'object') return;
+        const id = String(p.id || k);
+        if (!/^\d{1,6}$/.test(id)) return;
+        cleaned[id] = {
+          id: id,
+          name: String(p.name || ''),
+          gender: (p.gender === 'boy' || p.gender === 'girl') ? p.gender : '',
+          birthday: /^\d{4}-\d{2}-\d{2}$/.test(String(p.birthday || '')) ? p.birthday : '',
+          photo: (typeof p.photo === 'string' && p.photo.startsWith('data:image/')) ? p.photo : '',
+          issued: String(p.issued || todayStr()),
+          history: Array.isArray(p.history)
+            ? p.history.slice(-5).map(h => ({
+                date: String((h && h.date) || ''),
+                diagnosis: String((h && h.diagnosis) || '')
+              }))
+            : []
+        };
+      });
+      const count = Object.keys(cleaned).length;
+      if (!count) { alert('よみこめる データが ありませんでした'); return; }
+      const merged = Object.assign({}, loadPatients(), cleaned);
+      if (!savePatients(merged)) { alert('ほぞん できませんでした（ようりょう オーバー）'); return; }
+      renderAdminList();
+      alert(count + 'にんぶんを よみこみました');
+    };
+    reader.readAsText(file);
   });
 
   // --- リセット ---
