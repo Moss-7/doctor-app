@@ -1419,18 +1419,67 @@
     else state.selectedTests.delete(test);
   });
 
-  // --- 診断 ---
-  const diagnoses = {
-    'おなか': ['おなかの かぜ だね！','すこし おなかが つかれてるね','おなかの むしさんが げんき すぎるね'],
-    'あたま': ['すこし あたまが つかれてるね','あたまの かぜ だね！','かんがえ すぎちゃったかな'],
-    'のど': ['のどの かぜ だね！','のどが カラカラ だね','のどの ばいきんさんが いるね'],
-    'て・あし': ['すこし つかれが たまってるね','いっぱい あそんだ しょうこ だね！','きんにくさんが がんばりすぎ だね'],
-    'みみ': ['みみの おそうじが ひつよう だね','みみさんが すこし おつかれ だね','みみの なかに ちいさい ばいきんさんが いるね'],
-    'め': ['めが すこし つかれてるね','めの ばいきんさんを やっつけよう！','めを たくさん つかったね']
+  // --- 診断エンジン ---
+  // 重症度（1〜5）→ ていど の ことば
+  const severityWord = { 1: 'ちょっと', 2: 'すこし', 3: 'けっこう', 4: 'とても', 5: 'すごく' };
+
+  // 症状 → 「〜んだね」に つながる ことば
+  const symptomPhrase = {
+    'いたい': 'いたい',
+    'かゆい': 'かゆい',
+    'だるい': 'だるい',
+    'ねつがある': 'あつい',
+    'せきがでる': 'せきが でる'
   };
-  const medicines = ['いちごあじの おくすりシロップ','メロンあじの のみぐすり','にじいろ ばんそうこう','おほしさま カプセル','ブルーベリーあじの おくすり','ハートがたの ビタミンざい','きらきら おくすりシール','ぶどうあじの トローチ','さくらいろの ぬりぐすり','バナナあじの おくすりゼリー'];
-  const advicesNormal = ['きょうは はやく ねようね','おみずを たくさん のもうね','あったかく して やすんでね','だいじょうぶ！ すぐ げんきに なるよ','ゆっくり やすめば なおるよ','えいようの ある ごはんを たべようね'];
-  const advicesSerious = ['しっかり おやすみ してね！ だいじょうぶ！','たくさん ねて たくさん たべてね！','おくすりを のんで ぐっすり ねようね！','あしたには げんきに なるよ！ やくそく！'];
+
+  // 部位 × 症状 → びょうめい と おくすりの しゅるい
+  const diseaseByPart = {
+    'おなか':   { 'いたい': 'おなかの かぜ',   'かゆい': 'おなかの あせも',   'だるい': 'おなかの つかれ',   'せきがでる': 'おなかに きた かぜ',   'ねつがある': 'おなかの かぜ',   '_': 'おなかの ふちょう' },
+    'あたま':   { 'いたい': 'あたまいた',       'かゆい': 'あたまの かゆみ',   'だるい': 'あたまの つかれ',   'せきがでる': 'あたまに ひびく かぜ', 'ねつがある': 'あたまの かぜ',   '_': 'あたまの つかれ' },
+    'のど':     { 'いたい': 'のどの えんしょう', 'かゆい': 'のどの アレルギー', 'だるい': 'のどの かぜ',       'せきがでる': 'のどの かぜ',         'ねつがある': 'のどの かぜ',     '_': 'のどの ふちょう' },
+    'て・あし': { 'いたい': 'きんにくつう',     'かゆい': 'ひふの かゆみ',     'だるい': 'て・あしの つかれ', 'せきがでる': 'かぜの ひきはじめ',   'ねつがある': 'て・あしの だるさ', '_': 'て・あしの つかれ' },
+    'みみ':     { 'いたい': 'ちゅうじえん',     'かゆい': 'みみの かゆみ',     'だるい': 'みみの つまり',     'せきがでる': 'かぜから きた みみの ふちょう', 'ねつがある': 'みみの えんしょう', '_': 'みみの ふちょう' },
+    'め':       { 'いたい': 'めの えんしょう',   'かゆい': 'けつまくえん',       'だるい': 'めの つかれ',       'せきがでる': 'めと はなの アレルギー', 'ねつがある': 'めの えんしょう',  '_': 'めの つかれ' }
+  };
+
+  // 部位 → ほねの なまえ（レントゲン しんだんよう）
+  const boneName = {
+    'おなか': 'あばらぼね', 'あたま': 'あたまの ほね', 'のど': 'くびの ほね',
+    'て・あし': 'て・あしの ほね', 'みみ': 'みみの ほね', 'め': 'めの まわりの ほね'
+  };
+
+  // びょうきの しゅるい → おくすり
+  const medicineByCategory = {
+    double:   ['コロナと インフル りょうほうの おくすりセット 💊💊', 'ねつさましと のどの おくすりの スペシャルセット'],
+    covid:    ['コロナよう おくすりセットと ネブライザー', 'いちごあじの ねつさましと たっぷりの おみず'],
+    influ:    ['インフルエンザの おくすり（5にちぶん）', 'メロンあじの ぬりぐすりと ねつさまシート'],
+    fracture: ['まっしろな ギプスと いたみどめ 🦴', 'かたい ギプスと ぶどうあじの いたみどめ'],
+    crack:    ['ほねを まもる サポーターと いたみどめ', 'つよい ばんそうこうと カルシウム タブレット'],
+    pain:     ['いちごあじの いたみどめシロップ', 'ハートがたの いたみどめ ゼリー', 'ぶどうあじの いたみどめ'],
+    itch:     ['さくらいろの かゆみどめ ぬりぐすり', 'ひんやり かゆみどめ シート', 'にじいろ ばんそうこう'],
+    cough:    ['ぶどうあじの トローチ', 'はちみつあじの せきどめシロップ', 'メロンあじの せきどめ'],
+    fever:    ['メロンあじの ねつさましシロップ', 'ひんやり ねつさまシート', 'おほしさま ねつさまし カプセル'],
+    tired:    ['ハートがたの ビタミンざい', 'きらきら げんきが でる シール', 'バナナあじの えいようゼリー'],
+    other:    ['ブルーベリーあじの おくすり', 'にじいろ ばんそうこう', 'おほしさま カプセル'],
+    healthy:  ['おくすりは いらないよ！']
+  };
+
+  // びょうきの しゅるい → せんせいから ひとこと
+  const adviceByCategory = {
+    double:   ['コロナも インフルも みつかったよ！ たくさん ゆっくり やすんでね！', 'ふたつ いっぺんは たいへん！ おうちで しっかり ねんねしてね 🛌'],
+    covid:    ['コロナが みつかったよ！ おうちで ゆっくり やすんでね！', 'おうちの なかで しずかに すごしてね。すぐ よくなるよ！'],
+    influ:    ['インフルエンザ だよ！ しっかり おやすみ してね！', 'あたたかく して、ねつが さがるまで ねんねしてね！'],
+    fracture: ['ほねが なおるまで うごかさないでね！ やくそくだよ 🛌', 'ギプスが とれるまで しずかに すごそうね！'],
+    crack:    ['むりに うごかさないでね。すぐ くっつくよ！', 'やさしく して あげてね。1しゅうかんで よくなるよ！'],
+    pain:     ['いたいのは つらいね。おくすりを のんで やすもうね', 'いたいの いたいの とんでけー！ すぐ なおるよ'],
+    itch:     ['かいちゃ だめだよ！ ぬりぐすりを ぬろうね', 'つめを みじかく して、そっと して おこうね'],
+    cough:    ['おみずを のんで、のどを うるおしてね', 'マスクを して、あたたかく して すごしてね'],
+    fever:    ['おねつが あるから しっかり やすんでね！', 'おみずを たくさん のんで、ゆっくり ねようね'],
+    tired:    ['きょうは はやく ねようね', 'えいようの ある ごはんを たべて げんきに なろう！'],
+    other:    ['ゆっくり やすめば なおるよ', 'あったかく して やすんでね'],
+    healthy:  ['この ちょうしで がんばろう！', 'とっても けんこう だよ！ そのまま げんきでね']
+  };
+  const advicesSerious = ['しっかり おやすみ してね！ だいじょうぶ！', 'たくさん ねて たくさん たべてね！', 'おくすりを のんで ぐっすり ねようね！', 'あしたには げんきに なるよ！ やくそく！'];
 
   // 印なし → 正常
   const xrayDiagNormal = [
@@ -1494,41 +1543,31 @@
   }
 
   document.getElementById('diagnoseBtn').addEventListener('click', () => {
+    // ===== 1. にゅうりょくを あつめる =====
     const parts = Object.keys(state.selectedParts);
+    const symptoms = [...state.selectedSymptoms];
     const temp = parseFloat(document.getElementById('temperature').value);
     const hasFever = !isNaN(temp) && temp >= 37.5;
-    if (parts.length === 0 && state.selectedSymptoms.size === 0 && !hasFever) {
-      setResult('resultDiagnosis', 'とっても げんき だね！');
-      setResult('resultMedicine', 'おくすりは いらないよ！');
-      setResult('resultAdvice', 'この ちょうしで がんばろう！');
-    } else {
-      let mainPart = parts[0] || 'からだ', maxStrength = 0;
-      parts.forEach(p => { if (state.selectedParts[p] > maxStrength) { maxStrength = state.selectedParts[p]; mainPart = p; } });
-      setResult('resultDiagnosis', pick(diagnoses[mainPart] || ['ちょっと つかれて いるみたい']));
-      setResult('resultMedicine', pick(medicines));
-      if (hasFever) setResult('resultAdvice', 'おねつが あるから しっかり やすんでね！');
-      else if (maxStrength >= 4) setResult('resultAdvice', pick(advicesSerious));
-      else setResult('resultAdvice', pick(advicesNormal));
-    }
+    const highFever = !isNaN(temp) && temp >= 38.5;
 
-    // けんさ結果
+    // いちばん つらい ぶい
+    let mainPart = null, maxStrength = 0;
+    parts.forEach(p => { if (state.selectedParts[p] >= maxStrength) { maxStrength = state.selectedParts[p]; mainPart = p; } });
+
+    // ===== 2. けんさ を さきに はんてい（診断に はんえい させるため）=====
     const testBox = document.getElementById('testResultBox');
+    let covidPos = false, influPos = false;
     if (state.selectedTests.size > 0) {
       const lines = [];
+      // ねつが たかいほど ようせいに なりやすい
+      const posRate = highFever ? 0.5 : 0.3;
       if (state.selectedTests.has('covid')) {
-        const pos = Math.random() < 0.3;
-        lines.push('コロナ：' + (pos ? '🔴 ようせい' : '🟢 いんせい'));
-        if (pos) setResult('resultAdvice', 'コロナが みつかったよ！ おうちで ゆっくり やすんでね！');
+        covidPos = Math.random() < posRate;
+        lines.push('コロナ：' + (covidPos ? '🔴 ようせい' : '🟢 いんせい'));
       }
       if (state.selectedTests.has('influ')) {
-        const pos = Math.random() < 0.3;
-        lines.push('インフル：' + (pos ? '🔴 ようせい' : '🟢 いんせい'));
-        if (pos) setResult('resultAdvice', 'インフルエンザ だよ！ しっかり おやすみ してね！');
-      }
-      if (state.selectedTests.has('covid') && state.selectedTests.has('influ')) {
-        const covidPos = lines[0].includes('ようせい');
-        const influPos = lines[1].includes('ようせい');
-        if (covidPos && influPos) setResult('resultAdvice', 'コロナも インフルも みつかったよ！ たくさん ゆっくり やすんでね！');
+        influPos = Math.random() < posRate;
+        lines.push('インフル：' + (influPos ? '🔴 ようせい' : '🟢 いんせい'));
       }
       setResult('resultTest', lines.join('\n'));
       testBox.style.display = '';
@@ -1536,15 +1575,89 @@
       testBox.style.display = 'none';
     }
 
-    // レントゲン診断結果
+    // ===== 3. レントゲン を はんてい =====
     const xrayBox = document.getElementById('xrayResultBox');
     const xrayDiag = document.getElementById('xrayDiagnosis');
-    if (xrayBox.style.display !== 'none') {
-      const intensity = getDrawIntensity();
+    const hasXray = xrayBox.style.display !== 'none';
+    const boneState = hasXray ? getDrawIntensity() : null;
+    if (hasXray) {
       const diagPool = { normal: xrayDiagNormal, light: xrayDiagLight, moderate: xrayDiagModerate, heavy: xrayDiagHeavy };
-      document.getElementById('xrayDiagText').textContent = pick(diagPool[intensity]);
+      document.getElementById('xrayDiagText').textContent = pick(diagPool[boneState]);
       xrayDiag.style.display = '';
       xrayDiag.style.animation = 'none'; void xrayDiag.offsetWidth; xrayDiag.style.animation = '';
+    }
+
+    // ===== 4. しんだんを くみたてる =====
+    // (a) にゅうりょく を そのまま なぞる せつめい
+    const echo = [];
+    if (mainPart) {
+      const bodySym = symptoms.find(s => s !== 'ねつがある' && symptomPhrase[s]);
+      if (bodySym === 'せきがでる') {
+        echo.push(mainPart + 'が つらくて、せきが ' + severityWord[maxStrength] + ' でるんだね。');
+      } else {
+        const adj = bodySym ? symptomPhrase[bodySym] : 'つらい';
+        echo.push(mainPart + 'が ' + severityWord[maxStrength] + ' ' + adj + 'んだね。');
+      }
+    }
+    if (hasFever) echo.push(temp.toFixed(1) + '℃の おねつが あるね。');
+    else if (symptoms.includes('ねつがある')) echo.push('ねっぽく かんじるんだね。');
+    if (!mainPart && symptoms.length > 0) {
+      const list = symptoms.filter(s => s !== 'ねつがある').map(s => symptomPhrase[s]);
+      if (list.length) echo.push(list.join('・') + 'んだね。');
+    }
+
+    // (b) びょうめい と カテゴリを きめる（ゆうせん じゅんい つき）
+    let disease, category;
+    if (covidPos && influPos) {
+      disease = 'コロナと インフルエンザの ダブルかんせん'; category = 'double';
+    } else if (covidPos) {
+      disease = 'しんがた コロナウイルス'; category = 'covid';
+    } else if (influPos) {
+      disease = 'インフルエンザ'; category = 'influ';
+    } else if (boneState === 'heavy') {
+      disease = (mainPart ? boneName[mainPart] : 'ほね') + 'の こっせつ'; category = 'fracture';
+    } else if (boneState === 'moderate') {
+      disease = (mainPart ? boneName[mainPart] : 'ほね') + 'の ひび'; category = 'crack';
+    } else if (boneState === 'light') {
+      disease = (mainPart ? boneName[mainPart] : 'ほね') + 'の ひびの うたがい'; category = 'crack';
+    } else if (mainPart) {
+      const table = diseaseByPart[mainPart];
+      const key = symptoms.find(s => table[s]) || '_';
+      disease = table[key];
+      category = symptoms.includes('いたい') ? 'pain'
+               : symptoms.includes('かゆい') ? 'itch'
+               : symptoms.includes('せきがでる') ? 'cough'
+               : hasFever ? 'fever'
+               : symptoms.includes('だるい') ? 'tired'
+               : 'other';
+    } else if (hasFever) {
+      disease = highFever ? 'たかねつの かぜ' : 'かぜの ひきはじめ'; category = 'fever';
+    } else if (symptoms.length > 0) {
+      disease = symptoms.includes('せきがでる') ? 'のどの かぜ'
+              : symptoms.includes('かゆい') ? 'ひふの かゆみ'
+              : symptoms.includes('いたい') ? 'からだの いたみ'
+              : 'からだの つかれ';
+      category = symptoms.includes('せきがでる') ? 'cough'
+               : symptoms.includes('かゆい') ? 'itch'
+               : symptoms.includes('いたい') ? 'pain' : 'tired';
+    } else {
+      disease = null; category = 'healthy';
+    }
+
+    // (c) けっかを ひょうじ
+    if (category === 'healthy') {
+      setResult('resultDiagnosis', 'とっても げんき だね！ どこも わるくないよ 🌟');
+    } else {
+      setResult('resultDiagnosis', echo.join('') + '「' + disease + '」だよ！');
+    }
+    setResult('resultMedicine', pick(medicineByCategory[category]));
+
+    // アドバイス：おもいときは しんけんな メッセージ
+    const isSerious = category === 'double' || category === 'covid' || category === 'influ' || category === 'fracture' || highFever || maxStrength >= 4;
+    if (isSerious && Math.random() < 0.4 && category !== 'healthy') {
+      setResult('resultAdvice', pick(advicesSerious));
+    } else {
+      setResult('resultAdvice', pick(adviceByCategory[category]));
     }
 
     // モバイルのみ：結果パネルへ自動スクロール
