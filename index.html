@@ -614,7 +614,6 @@
 
   /* ===== カメラ ===== */
   .camera-btn {
-    margin-top: 10px;
     padding: 8px 18px;
     border: 2px solid #f8bbd0;
     border-radius: 30px;
@@ -879,6 +878,212 @@
     box-shadow: 0 2px 8px rgba(233,30,99,0.2);
   }
 
+  /* ===== 診察券 ===== */
+  .patient-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .card-make-btn,
+  .card-load-btn {
+    padding: 8px 18px;
+    border-radius: 30px;
+    background: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .card-make-btn { border: 2px solid #ffcc80; color: #ef6c00; }
+  .card-make-btn:hover { background: #fff3e0; }
+  .card-load-btn { border: 2px solid #b39ddb; color: #5e35b1; }
+  .card-load-btn:hover { background: #ede7f6; }
+
+  .card-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .card-modal-inner {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  /* 診察券ほんたい（100mm × 62mm） */
+  .ticket {
+    width: 100mm;
+    max-width: 100%;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #fff9f0 0%, #fff 55%, #f0f8ff 100%);
+    border: 2px solid #f8bbd0;
+    border-radius: 10px;
+    padding: 4mm 5mm;
+    display: flex;
+    flex-direction: column;
+    gap: 2mm;
+    color: #5d4037;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  }
+
+  .ticket-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px dashed #f8bbd0;
+    padding-bottom: 1.5mm;
+  }
+  .ticket-clinic { font-size: 12px; font-weight: bold; color: #e91e63; }
+  .ticket-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #ad1457;
+    border: 1px solid #f8bbd0;
+    border-radius: 20px;
+    padding: 1px 8px;
+  }
+
+  .ticket-body {
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+    flex: 1;
+  }
+
+  .ticket-photo {
+    width: 16mm;
+    height: 16mm;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #f8bbd0;
+    flex-shrink: 0;
+  }
+
+  .ticket-info {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.8mm 3mm;
+    font-size: 11px;
+    flex: 1;
+    min-width: 0;
+  }
+  .ticket-info dt { color: #ad1457; white-space: nowrap; }
+  .ticket-info dd { font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ticket-info dd#ticketNo { font-size: 15px; letter-spacing: 2px; color: #e91e63; }
+
+  .ticket-qr {
+    width: 20mm;
+    height: 20mm;
+    flex-shrink: 0;
+  }
+  .ticket-qr svg { width: 100%; height: 100%; display: block; }
+
+  .ticket-foot {
+    font-size: 8px;
+    color: #a1887f;
+    border-top: 1px dashed #f8bbd0;
+    padding-top: 1.2mm;
+  }
+
+  .card-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+  .card-print-btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #ffb74d, #f48fb1);
+    color: #fff;
+    font-size: 18px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .card-print-btn:hover { transform: scale(1.05); }
+
+  /* 呼び出しモーダル */
+  .scan-hint { font-size: 14px; color: #7b1fa2; text-align: center; line-height: 1.7; }
+
+  .recall-list-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #e91e63;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .recall-list {
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .recall-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 2px solid #e1bee7;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    text-align: left;
+    color: #5d4037;
+    width: 100%;
+  }
+  .recall-item:hover { background: #f3e5f5; }
+  .recall-item img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .recall-item .rc-no { font-weight: bold; color: #7b1fa2; letter-spacing: 1px; }
+  .recall-item .rc-sub { font-size: 12px; color: #999; }
+  .recall-empty { font-size: 14px; color: #aaa; text-align: center; padding: 16px; }
+
+  /* ===== いんさつ ===== */
+  @media print {
+    body { background: #fff; padding: 0; }
+    body > *:not(#cardModal) { display: none !important; }
+    #cardModal {
+      display: block !important;
+      position: static !important;
+      inset: auto;
+      background: none;
+      padding: 0;
+      overflow: visible;
+    }
+    .card-modal-inner {
+      display: block;
+      max-width: none;
+      padding: 0;
+      background: none;
+      border-radius: 0;
+    }
+    .card-actions { display: none !important; }
+    .ticket {
+      box-shadow: none;
+      border: 1.5px solid #999;
+      page-break-inside: avoid;
+      background: #fff;
+    }
+  }
+
   /* ===========================
      RESPONSIVE LAYOUT
      Mobile-first breakpoints:
@@ -1090,7 +1295,11 @@
             <input type="date" id="birthDate" min="2019-01-01" max="2026-12-31">
           </div>
         </div>
-        <button class="camera-btn" id="cameraBtn">📷 しゃしんを とる</button>
+        <div class="patient-actions">
+          <button class="camera-btn" id="cameraBtn">📷 しゃしんを とる</button>
+          <button class="card-make-btn" id="makeCardBtn">🎫 しんさつけんを つくる</button>
+          <button class="card-load-btn" id="loadCardBtn">🔍 しんさつけんで よびだす</button>
+        </div>
       </div>
 
       <!-- どこがつらい -->
@@ -1262,6 +1471,47 @@
   </div>
 </div>
 
+<!-- 診察券モーダル -->
+<div class="card-modal" id="cardModal" style="display:none;">
+  <div class="card-modal-inner">
+    <div class="camera-modal-title">🎫 しんさつけんが できたよ！</div>
+    <div class="ticket" id="ticket">
+      <div class="ticket-head">
+        <span class="ticket-clinic">🏥 でんしカルテ クリニック</span>
+        <span class="ticket-label">しんさつけん</span>
+      </div>
+      <div class="ticket-body">
+        <img class="ticket-photo" id="ticketPhoto" src="" alt="" style="display:none;">
+        <dl class="ticket-info">
+          <dt>けんばんごう</dt><dd id="ticketNo">0001</dd>
+          <dt>なまえ</dt><dd id="ticketName">ー</dd>
+          <dt>せいべつ</dt><dd id="ticketGender">ー</dd>
+          <dt>たんじょうび</dt><dd id="ticketBirthday">ー</dd>
+        </dl>
+        <div class="ticket-qr" id="ticketQr"></div>
+      </div>
+      <div class="ticket-foot">はっこうび <span id="ticketIssued"></span>　／　QRを よみとると よびだせます</div>
+    </div>
+    <div class="card-actions">
+      <button class="card-print-btn" id="cardPrintBtn">🖨 いんさつする</button>
+      <button class="camera-close-btn" id="cardCloseBtn">✕ とじる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 診察券よびだしモーダル -->
+<div class="card-modal" id="recallModal" style="display:none;">
+  <div class="card-modal-inner">
+    <div class="camera-modal-title">🔍 しんさつけんで よびだす</div>
+    <video class="camera-video" id="scanVideo" autoplay playsinline muted style="display:none;"></video>
+    <div class="scan-hint" id="scanHint"></div>
+    <button class="camera-capture-btn" id="scanStartBtn">📷 QRを よみとる</button>
+    <div class="recall-list-title">とうろく されている かんじゃさん</div>
+    <div class="recall-list" id="recallList"></div>
+    <button class="camera-close-btn" id="recallCloseBtn">✕ とじる</button>
+  </div>
+</div>
+
 <!-- カメラモーダル -->
 <div class="camera-modal" id="cameraModal" style="display:none;">
   <div class="camera-modal-inner">
@@ -1280,7 +1530,7 @@
 <script>
   // --- バージョン情報 ---
   // ★ 変更するたびに ここを 更新する
-  const APP_VERSION = 'v1.5.0';
+  const APP_VERSION = 'v1.6.0';
   const APP_UPDATED = '2026-08-11';
   document.getElementById('versionBadge').textContent = APP_VERSION + ' · ' + APP_UPDATED;
 
@@ -1288,7 +1538,8 @@
   const state = {
     selectedParts: {},
     selectedSymptoms: new Set(),
-    selectedTests: new Set()
+    selectedTests: new Set(),
+    currentCardId: null
   };
 
   // --- 受付番号 ---
@@ -1689,6 +1940,18 @@
       setResult('resultAdvice', pick(adviceByCategory[category]));
     }
 
+    // しんさつけんが あれば りれきに のこす
+    if (state.currentCardId) {
+      const patients = loadPatients();
+      const p = patients[state.currentCardId];
+      if (p) {
+        p.history = p.history || [];
+        p.history.push({ date: todayStr(), diagnosis: disease || 'げんき' });
+        if (p.history.length > 5) p.history = p.history.slice(-5);
+        savePatients(patients);
+      }
+    }
+
     // モバイルのみ：結果パネルへ自動スクロール
     if (window.innerWidth < 640) {
       const rightPanel = document.querySelector('.right-panel');
@@ -1981,6 +2244,460 @@
     ctx.fillRect(0, 0, width, height);
   }
 
+  // ===== QRコード エンコーダ（バイトモード / ていせいど M / バージョン1〜6）=====
+  const QRCode = (() => {
+    // --- GF(256) ---
+    const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+    (() => {
+      let x = 1;
+      for (let i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 0x100) x ^= 0x11d; }
+      for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+    })();
+    const mul = (a, b) => (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+
+    // ていせいど M の ブロックこうせい
+    const SPECS = {
+      1: { ec: 10, groups: [[1, 16]] },
+      2: { ec: 16, groups: [[1, 28]] },
+      3: { ec: 26, groups: [[1, 44]] },
+      4: { ec: 18, groups: [[2, 32]] },
+      5: { ec: 24, groups: [[2, 43]] },
+      6: { ec: 16, groups: [[4, 27]] }
+    };
+    const ALIGN = { 1: [], 2: [6,18], 3: [6,22], 4: [6,26], 5: [6,30], 6: [6,34] };
+
+    const MASKS = [
+      (i,j) => (i + j) % 2 === 0,
+      (i,j) => i % 2 === 0,
+      (i,j) => j % 3 === 0,
+      (i,j) => (i + j) % 3 === 0,
+      (i,j) => (Math.floor(i/2) + Math.floor(j/3)) % 2 === 0,
+      (i,j) => (i*j) % 2 + (i*j) % 3 === 0,
+      (i,j) => ((i*j) % 2 + (i*j) % 3) % 2 === 0,
+      (i,j) => ((i+j) % 2 + (i*j) % 3) % 2 === 0
+    ];
+
+    function rsGenPoly(deg) {
+      let poly = [1];
+      for (let i = 0; i < deg; i++) {
+        const next = new Array(poly.length + 1).fill(0);
+        for (let j = 0; j < poly.length; j++) {
+          next[j] ^= poly[j];
+          next[j + 1] ^= mul(poly[j], EXP[i]);
+        }
+        poly = next;
+      }
+      return poly;
+    }
+
+    function rsEncode(data, ecLen) {
+      const gen = rsGenPoly(ecLen);
+      const res = new Uint8Array(data.length + ecLen);
+      res.set(data);
+      for (let i = 0; i < data.length; i++) {
+        const factor = res[i];
+        if (factor === 0) continue;
+        for (let j = 0; j < gen.length; j++) res[i + j] ^= mul(gen[j], factor);
+      }
+      return res.slice(data.length);
+    }
+
+    function buildCodewords(bytes) {
+      let version = 0, spec = null, dataCap = 0;
+      for (let v = 1; v <= 6; v++) {
+        const s = SPECS[v];
+        const cap = s.groups.reduce((a, [n, c]) => a + n * c, 0);
+        if (4 + 8 + bytes.length * 8 <= cap * 8) { version = v; spec = s; dataCap = cap; break; }
+      }
+      if (!version) throw new Error('QR: データが ながすぎます');
+
+      const bits = [];
+      const put = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+      put(4, 4);                 // バイトモード
+      put(bytes.length, 8);      // もじすう（バージョン1〜9は8bit）
+      for (const b of bytes) put(b, 8);
+
+      const capBits = dataCap * 8;
+      for (let i = 0; i < 4 && bits.length < capBits; i++) bits.push(0);
+      while (bits.length % 8 !== 0) bits.push(0);
+      const PAD = [0xEC, 0x11];
+      let p = 0;
+      while (bits.length < capBits) put(PAD[p++ % 2], 8);
+
+      const dataCw = [];
+      for (let i = 0; i < bits.length; i += 8) {
+        let b = 0;
+        for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+        dataCw.push(b);
+      }
+
+      const blocks = [];
+      let off = 0;
+      for (const [count, len] of spec.groups) {
+        for (let i = 0; i < count; i++) {
+          const d = dataCw.slice(off, off + len); off += len;
+          blocks.push({ data: d, ec: rsEncode(Uint8Array.from(d), spec.ec) });
+        }
+      }
+      const out = [];
+      const maxLen = Math.max(...blocks.map(b => b.data.length));
+      for (let i = 0; i < maxLen; i++) for (const b of blocks) if (i < b.data.length) out.push(b.data[i]);
+      for (let i = 0; i < spec.ec; i++) for (const b of blocks) out.push(b.ec[i]);
+      return { version, codewords: out };
+    }
+
+    function buildMatrix(version, codewords) {
+      const size = version * 4 + 17;
+      const mods = Array.from({ length: size }, () => new Array(size).fill(false));
+      const res  = Array.from({ length: size }, () => new Array(size).fill(false));
+
+      // ファインダ＋セパレータ
+      const finder = (r, c) => {
+        for (let dr = -1; dr <= 7; dr++) for (let dc = -1; dc <= 7; dc++) {
+          const rr = r + dr, cc = c + dc;
+          if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+          const inner = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6;
+          mods[rr][cc] = inner && ((dr === 0 || dr === 6 || dc === 0 || dc === 6) ||
+                                  (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4));
+          res[rr][cc] = true;
+        }
+      };
+      finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+      // タイミングパターン
+      for (let i = 8; i < size - 8; i++) {
+        if (!res[6][i]) { mods[6][i] = i % 2 === 0; res[6][i] = true; }
+        if (!res[i][6]) { mods[i][6] = i % 2 === 0; res[i][6] = true; }
+      }
+
+      // アライメントパターン
+      const pos = ALIGN[version];
+      for (const r of pos) for (const c of pos) {
+        if (res[r][c]) continue;
+        for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+          mods[r + dr][c + dc] = Math.max(Math.abs(dr), Math.abs(dc)) !== 1;
+          res[r + dr][c + dc] = true;
+        }
+      }
+
+      // ダークモジュール
+      mods[size - 8][8] = true; res[size - 8][8] = true;
+
+      // フォーマット情報の よやく
+      for (let i = 0; i <= 8; i++) { res[8][i] = true; res[i][8] = true; }
+      for (let i = size - 8; i < size; i++) { res[8][i] = true; res[i][8] = true; }
+
+      // データはいち（ジグザグ）
+      let dir = -1, row = size - 1, bit = 0;
+      const totalBits = codewords.length * 8;
+      for (let col = size - 1; col > 0; col -= 2) {
+        if (col === 6) col--;
+        for (;;) {
+          for (let k = 0; k < 2; k++) {
+            const cc = col - k;
+            if (!res[row][cc]) {
+              mods[row][cc] = bit < totalBits
+                ? ((codewords[bit >> 3] >> (7 - (bit & 7))) & 1) === 1
+                : false;
+              bit++;
+            }
+          }
+          row += dir;
+          if (row < 0 || row >= size) { row -= dir; dir = -dir; break; }
+        }
+      }
+      return { size, mods, res };
+    }
+
+    function penalty(m, size) {
+      let score = 0;
+      // ルール1: れんぞく5こいじょう
+      for (let i = 0; i < size; i++) {
+        for (const rowMode of [true, false]) {
+          let run = 1;
+          for (let j = 1; j < size; j++) {
+            const a = rowMode ? m[i][j] : m[j][i];
+            const b = rowMode ? m[i][j-1] : m[j-1][i];
+            if (a === b) run++;
+            else { if (run >= 5) score += 3 + (run - 5); run = 1; }
+          }
+          if (run >= 5) score += 3 + (run - 5);
+        }
+      }
+      // ルール2: 2x2 ブロック
+      for (let i = 0; i < size - 1; i++) for (let j = 0; j < size - 1; j++) {
+        const v = m[i][j];
+        if (v === m[i][j+1] && v === m[i+1][j] && v === m[i+1][j+1]) score += 3;
+      }
+      // ルール3: 1:1:3:1:1 パターン
+      const P1 = [true,false,true,true,true,false,true,false,false,false,false];
+      const P2 = [false,false,false,false,true,false,true,true,true,false,true];
+      const match = (arr, pat) => pat.every((v, k) => arr[k] === v);
+      for (let i = 0; i < size; i++) for (let j = 0; j <= size - 11; j++) {
+        const rowSeg = [], colSeg = [];
+        for (let k = 0; k < 11; k++) { rowSeg.push(m[i][j+k]); colSeg.push(m[j+k][i]); }
+        if (match(rowSeg, P1) || match(rowSeg, P2)) score += 40;
+        if (match(colSeg, P1) || match(colSeg, P2)) score += 40;
+      }
+      // ルール4: しろくろの わりあい
+      let dark = 0;
+      for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) if (m[i][j]) dark++;
+      const pct = dark * 100 / (size * size);
+      score += Math.floor(Math.abs(pct - 50) / 5) * 10;
+      return score;
+    }
+
+    function placeFormat(mods, size, mask) {
+      const data = (0b00 << 3) | mask;  // ていせいど M = 00
+      let rem = data;
+      for (let i = 0; i < 10; i++) rem = (rem << 1) ^ (((rem >> 9) & 1) * 0x537);
+      const fmt = (((data << 10) | rem) ^ 0x5412) & 0x7fff;
+      // i は はいち じゅんばん（i=0 が さいじょうい ビット14）
+      for (let i = 0; i < 15; i++) {
+        const b = ((fmt >> (14 - i)) & 1) === 1;
+        // コピー1（ひだりうえ ファインダの まわり）
+        if (i < 6) mods[8][i] = b;
+        else if (i === 6) mods[8][7] = b;
+        else if (i === 7) mods[8][8] = b;
+        else if (i === 8) mods[7][8] = b;
+        else mods[14 - i][8] = b;
+        // コピー2（みぎうえ・ひだりした）
+        if (i < 7) mods[size - 1 - i][8] = b;
+        else mods[8][size - 15 + i] = b;
+      }
+    }
+
+    function generate(text) {
+      const bytes = new TextEncoder().encode(text);
+      const { version, codewords } = buildCodewords(bytes);
+      const { size, mods, res } = buildMatrix(version, codewords);
+
+      let best = null;
+      for (let mask = 0; mask < 8; mask++) {
+        const test = mods.map(r => r.slice());
+        for (let i = 0; i < size; i++) for (let j = 0; j < size; j++)
+          if (!res[i][j] && MASKS[mask](i, j)) test[i][j] = !test[i][j];
+        placeFormat(test, size, mask);
+        const s = penalty(test, size);
+        if (!best || s < best.score) best = { score: s, matrix: test };
+      }
+      return best.matrix;
+    }
+
+    function toSVG(matrix, moduleSize = 4, quiet = 4) {
+      const n = matrix.length;
+      const dim = (n + quiet * 2) * moduleSize;
+      let path = '';
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+        if (matrix[r][c]) path += 'M' + ((c + quiet) * moduleSize) + ' ' + ((r + quiet) * moduleSize) +
+          'h' + moduleSize + 'v' + moduleSize + 'h-' + moduleSize + 'z';
+      }
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + dim + ' ' + dim +
+        '" shape-rendering="crispEdges"><rect width="' + dim + '" height="' + dim +
+        '" fill="#fff"/><path d="' + path + '" fill="#000"/></svg>';
+    }
+
+    return { generate, toSVG };
+  })();
+
+  // ===== しんさつけん =====
+  const CARD_STORE = 'denshi-karte-patients-v1';
+
+  function loadPatients() {
+    try { return JSON.parse(localStorage.getItem(CARD_STORE)) || {}; } catch (e) { return {}; }
+  }
+  function savePatients(p) {
+    try { localStorage.setItem(CARD_STORE, JSON.stringify(p)); return true; } catch (e) { return false; }
+  }
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function genderLabel(g) {
+    return g === 'boy' ? 'おとこのこ' : g === 'girl' ? 'おんなのこ' : 'ー';
+  }
+  function birthdayLabel(v) {
+    if (!v) return 'ー';
+    const [y, m, d] = v.split('-');
+    return Number(y) + 'ねん ' + Number(m) + 'がつ ' + Number(d) + 'にち';
+  }
+  // しゃしんを ちいさく して ほぞんりょうを へらす
+  function makeThumb(dataUrl, size, cb) {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      const s = Math.min(img.width, img.height);
+      c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+      cb(c.toDataURL('image/jpeg', 0.7));
+    };
+    img.onerror = () => cb('');
+    img.src = dataUrl;
+  }
+
+  // --- しんさつけんを つくる ---
+  document.getElementById('makeCardBtn').addEventListener('click', () => {
+    const name = document.getElementById('patientName').value.trim();
+    if (!name) { alert('さきに なまえを いれてね！'); return; }
+    const genderEl = document.querySelector('input[name="gender"]:checked');
+    const patients = loadPatients();
+    let id = state.currentCardId;
+    if (!id) {
+      const nums = Object.keys(patients).map(Number).filter(n => !isNaN(n));
+      id = String((nums.length ? Math.max.apply(null, nums) : 0) + 1).padStart(4, '0');
+    }
+    const wrap = document.getElementById('patientPhotoWrap');
+    const photoSrc = wrap.style.display === 'none' ? '' : document.getElementById('patientPhoto').src;
+
+    const finish = (thumb) => {
+      const prev = patients[id] || {};
+      patients[id] = {
+        id: id,
+        name: name,
+        gender: genderEl ? genderEl.value : '',
+        birthday: document.getElementById('birthDate').value,
+        photo: thumb || prev.photo || '',
+        issued: prev.issued || todayStr(),
+        history: prev.history || []
+      };
+      if (!savePatients(patients)) alert('ほぞん できませんでした（ほぞん ようりょうが いっぱいです）');
+      state.currentCardId = id;
+      showCard(patients[id]);
+    };
+    if (photoSrc && photoSrc.startsWith('data:')) makeThumb(photoSrc, 160, finish);
+    else finish('');
+  });
+
+  function showCard(p) {
+    document.getElementById('ticketNo').textContent = p.id;
+    document.getElementById('ticketName').textContent = p.name || 'ー';
+    document.getElementById('ticketGender').textContent = genderLabel(p.gender);
+    document.getElementById('ticketBirthday').textContent = birthdayLabel(p.birthday);
+    document.getElementById('ticketIssued').textContent = p.issued;
+    const ph = document.getElementById('ticketPhoto');
+    if (p.photo) { ph.src = p.photo; ph.style.display = ''; } else { ph.removeAttribute('src'); ph.style.display = 'none'; }
+    try {
+      document.getElementById('ticketQr').innerHTML = QRCode.toSVG(QRCode.generate('DRAPP-' + p.id));
+    } catch (e) {
+      document.getElementById('ticketQr').textContent = '';
+    }
+    document.getElementById('cardModal').style.display = 'flex';
+  }
+
+  document.getElementById('cardPrintBtn').addEventListener('click', () => window.print());
+  document.getElementById('cardCloseBtn').addEventListener('click', () => {
+    document.getElementById('cardModal').style.display = 'none';
+  });
+  document.getElementById('cardModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('cardModal')) document.getElementById('cardModal').style.display = 'none';
+  });
+
+  // --- しんさつけんで よびだす ---
+  let scanStream = null, scanTimer = null;
+
+  document.getElementById('loadCardBtn').addEventListener('click', () => {
+    renderRecallList();
+    document.getElementById('scanHint').textContent = '';
+    document.getElementById('recallModal').style.display = 'flex';
+  });
+
+  function renderRecallList() {
+    const patients = loadPatients();
+    const list = document.getElementById('recallList');
+    const ids = Object.keys(patients).sort();
+    if (!ids.length) {
+      list.innerHTML = '<div class="recall-empty">まだ しんさつけんが ありません</div>';
+      return;
+    }
+    list.innerHTML = '';
+    ids.forEach(id => {
+      const p = patients[id];
+      const btn = document.createElement('button');
+      btn.className = 'recall-item';
+      btn.dataset.id = id;
+      const last = (p.history && p.history.length) ? p.history[p.history.length - 1] : null;
+      btn.innerHTML =
+        (p.photo ? '<img src="' + p.photo + '" alt="">' : '') +
+        '<span><span class="rc-no">' + escapeHtml(p.id) + '</span> ' + escapeHtml(p.name || '') +
+        (last ? '<br><span class="rc-sub">まえかい ' + escapeHtml(last.date) + '　' + escapeHtml(last.diagnosis) + '</span>' : '') +
+        '</span>';
+      list.appendChild(btn);
+    });
+  }
+
+  document.getElementById('recallList').addEventListener('click', (e) => {
+    const item = e.target.closest('.recall-item');
+    if (item) loadPatientIntoForm(item.dataset.id);
+  });
+
+  function loadPatientIntoForm(id) {
+    const p = loadPatients()[id];
+    if (!p) {
+      document.getElementById('scanHint').textContent = 'その しんさつけんは とうろく されて いません';
+      return;
+    }
+    document.getElementById('patientName').value = p.name || '';
+    document.querySelectorAll('input[name="gender"]').forEach(r => { r.checked = (r.value === p.gender); });
+    document.getElementById('birthDate').value = p.birthday || '';
+    if (p.photo) {
+      document.getElementById('patientPhoto').src = p.photo;
+      document.getElementById('patientPhotoWrap').style.display = '';
+      document.getElementById('cameraBtn').textContent = '📷 とりなおす';
+    }
+    state.currentCardId = id;
+    updateSummary();
+    closeRecall();
+  }
+
+  document.getElementById('scanStartBtn').addEventListener('click', startScan);
+
+  async function startScan() {
+    const hint = document.getElementById('scanHint');
+    const video = document.getElementById('scanVideo');
+    if (!('BarcodeDetector' in window)) {
+      hint.textContent = 'この ブラウザは QRの よみとりに たいおうして いません。したの リストから えらんでね。';
+      return;
+    }
+    try {
+      scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      video.srcObject = scanStream;
+      video.style.display = '';
+      hint.textContent = 'しんさつけんの QRコードを うつしてね 📷';
+      const detector = new BarcodeDetector({ formats: ['qr_code'] });
+      scanTimer = setInterval(async () => {
+        try {
+          const codes = await detector.detect(video);
+          for (const c of codes) {
+            const m = /^DRAPP-(\d{4})$/.exec(String(c.rawValue).trim());
+            if (m) { stopScan(); loadPatientIntoForm(m[1]); return; }
+          }
+        } catch (err) { /* よみとり しっぱいは むし */ }
+      }, 300);
+    } catch (e) {
+      hint.textContent = 'カメラが つかえないよ😢 したの リストから えらんでね。';
+    }
+  }
+
+  function stopScan() {
+    if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+    if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+    const v = document.getElementById('scanVideo');
+    v.srcObject = null;
+    v.style.display = 'none';
+  }
+
+  function closeRecall() {
+    stopScan();
+    document.getElementById('recallModal').style.display = 'none';
+  }
+  document.getElementById('recallCloseBtn').addEventListener('click', closeRecall);
+  document.getElementById('recallModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('recallModal')) closeRecall();
+  });
+
   // --- リセット ---
   document.getElementById('resetBtn').addEventListener('click', () => {
     document.getElementById('receptionNumber').textContent = generateReceptionNumber();
@@ -2020,6 +2737,7 @@
     document.getElementById('animeImage').src = '';
     document.getElementById('animeResultBox').style.display = 'none';
     document.getElementById('animeBtn').textContent = '🎨 アニメ';
+    state.currentCardId = null;
     updateSummary();
   });
 </script>
